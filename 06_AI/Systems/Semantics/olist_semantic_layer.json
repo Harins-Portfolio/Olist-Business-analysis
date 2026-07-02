@@ -1,0 +1,214 @@
+{
+  "_readme": "SEMANTIC LAYER — Olist E-Commerce Project. OpenCode reads this file alongside CLAUDE.md at the start of every session. It defines every table, join, field meaning, and canonical metric so you never have to re-explain the data model.",
+
+  "project": "Olist E-Commerce Analysis",
+  "master_table": "02_Cleaned_Data/olist_master.csv",
+  "kpi_source": "02_Cleaned_Data/kpi_tables/KPI_MASTER_DASHBOARD.csv",
+
+  "critical_rules": [
+    "ALWAYS use customer_unique_id for customer counts — never customer_id (customer_id inflates count because one person can have multiple IDs)",
+    "ALWAYS filter to order_status = 'delivered' for revenue and satisfaction analysis",
+    "ALWAYS use payment_value from payments table for revenue — not price from order_items (price is item-level only)",
+    "NEVER modify files in 01_Raw_Data/ — read only",
+    "Currency is BRL throughout — no conversion"
+  ],
+
+  "tables": {
+    "olist_orders_dataset": {
+      "file": "01_Raw_Data/olist_orders_dataset.csv",
+      "clean_file": "02_Cleaned_Data/orders_clean.csv",
+      "role": "central fact table — every order placed on the platform",
+      "row_grain": "one row per order",
+      "row_count": 99441,
+      "primary_key": "order_id",
+      "foreign_keys": {
+        "customer_id": "links to olist_customers_dataset"
+      },
+      "key_columns": {
+        "order_id": "unique identifier for each order — use this to join every other table",
+        "customer_id": "WARNING: do not use for customer counts — use customer_unique_id from customers table instead",
+        "order_status": "delivered | shipped | canceled | invoiced | processing | unavailable | created — filter to delivered for all revenue analysis",
+        "order_purchase_timestamp": "when the customer placed the order — use this as the primary date for time-series analysis",
+        "order_approved_at": "when payment was approved",
+        "order_delivered_carrier_date": "when seller handed to carrier",
+        "order_delivered_customer_date": "when customer received the order",
+        "order_estimated_delivery_date": "promised delivery date — compare to delivered date for on-time calculation"
+      },
+      "derived_columns_to_calculate": {
+        "delivery_days": "order_delivered_customer_date minus order_purchase_timestamp in days",
+        "days_early_or_late": "order_estimated_delivery_date minus order_delivered_customer_date — positive = early, negative = late",
+        "is_late": "1 if days_early_or_late is negative (arrived after promised date), else 0",
+        "order_month": "YYYY-MM extracted from order_purchase_timestamp"
+      }
+    },
+
+    "olist_order_payments_dataset": {
+      "file": "01_Raw_Data/olist_order_payments_dataset.csv",
+      "clean_file": "02_Cleaned_Data/payments_clean.csv",
+      "role": "how each order was paid and for how much",
+      "row_grain": "one row per payment — WARNING: one order can have multiple rows (split payments)",
+      "row_count": 103886,
+      "primary_key": "order_id + payment_sequential",
+      "key_columns": {
+        "order_id": "joins to orders table",
+        "payment_type": "credit_card | boleto | voucher | debit_card",
+        "payment_value": "THIS IS THE REVENUE COLUMN — use SUM(payment_value) grouped by order_id for total order revenue",
+        "payment_installments": "number of installments chosen"
+      },
+      "aggregation_note": "Always aggregate to one row per order_id before joining: total_payment_value = SUM(payment_value)"
+    },
+
+    "olist_order_items_dataset": {
+      "file": "01_Raw_Data/olist_order_items_dataset.csv",
+      "clean_file": "02_Cleaned_Data/order_items_clean.csv",
+      "role": "what was in each order at item level",
+      "row_grain": "one row per item — one order can have multiple rows",
+      "row_count": 112650,
+      "primary_key": "order_id + order_item_id",
+      "key_columns": {
+        "order_id": "joins to orders table",
+        "product_id": "joins to products table",
+        "seller_id": "joins to sellers table",
+        "price": "item price — NOT the same as payment_value. Use payment_value for total revenue analysis.",
+        "freight_value": "shipping cost for this item"
+      },
+      "aggregation_note": "Aggregate to one row per order_id: item_count = COUNT, total_items_price = SUM(price), total_freight = SUM(freight_value)"
+    },
+
+    "olist_order_reviews_dataset": {
+      "file": "01_Raw_Data/olist_order_reviews_dataset.csv",
+      "clean_file": "02_Cleaned_Data/reviews_clean.csv",
+      "role": "customer satisfaction ratings per order",
+      "row_grain": "one row per review",
+      "row_count": 99224,
+      "primary_key": "review_id",
+      "key_columns": {
+        "order_id": "joins to orders table",
+        "review_score": "integer 1-5 — 1 and 2 are negative reviews, 4 and 5 are positive",
+        "review_comment_message": "written comment — 41% of reviews have one, 59% are blank",
+        "review_creation_date": "when the review was submitted"
+      },
+      "do_not_use": "review_comment_title — 88% empty, unreliable"
+    },
+
+    "olist_customers_dataset": {
+      "file": "01_Raw_Data/olist_customers_dataset.csv",
+      "role": "customer registry with location",
+      "row_count": 99441,
+      "key_columns": {
+        "customer_id": "WARNING: inflated — one real customer can have multiple customer_id values across different orders",
+        "customer_unique_id": "USE THIS for all customer counts — represents one real person",
+        "customer_city": "city of delivery address",
+        "customer_state": "two-letter Brazilian state code — SP is São Paulo, RJ is Rio de Janeiro"
+      }
+    },
+
+    "olist_products_dataset": {
+      "file": "01_Raw_Data/olist_products_dataset.csv",
+      "clean_file": "02_Cleaned_Data/products_clean.csv",
+      "role": "product catalogue",
+      "row_count": 32951,
+      "key_columns": {
+        "product_id": "joins to order_items table",
+        "product_category_name": "category in Portuguese — always join to translation table for English",
+        "category_english": "English translation — use this for all analysis and reporting"
+      },
+      "known_issue": "610 products have null product_category_name — these are labelled 'uncategorized' in the clean file, not dropped"
+    },
+
+    "olist_sellers_dataset": {
+      "file": "01_Raw_Data/olist_sellers_dataset.csv",
+      "role": "seller registry with location",
+      "row_count": 3095,
+      "key_columns": {
+        "seller_id": "joins to order_items table",
+        "seller_city": "city where seller is based",
+        "seller_state": "two-letter Brazilian state code"
+      }
+    },
+
+    "product_category_name_translation": {
+      "file": "01_Raw_Data/product_category_name_translation.csv",
+      "role": "Portuguese to English category name mapping",
+      "row_count": 71,
+      "join": "join to products on product_category_name to get category_english"
+    },
+
+    "olist_geolocation_dataset": {
+      "file": "01_Raw_Data/olist_geolocation_dataset.csv",
+      "clean_file": "02_Cleaned_Data/geolocation_clean.csv",
+      "role": "GPS coordinates for Brazilian zip codes",
+      "row_count_raw": 1000163,
+      "row_count_clean": "~19000 unique zip codes after deduplication",
+      "known_issue": "raw file has 1M+ rows — always use geolocation_clean.csv which has one row per zip_code_prefix"
+    },
+
+    "olist_master": {
+      "file": "02_Cleaned_Data/olist_master.csv",
+      "role": "PRE-JOINED master table — use this for all analysis instead of joining raw tables manually",
+      "row_grain": "one row per delivered order",
+      "note": "already contains all key columns from orders, customers, payments (aggregated), items (aggregated), reviews"
+    }
+  },
+
+  "joins": {
+    "primary_join_path": "orders → customers via customer_id | orders → payments via order_id | orders → order_items via order_id | orders → reviews via order_id | order_items → products via product_id | order_items → sellers via seller_id | products → translation via product_category_name",
+    "shortcut": "Use olist_master.csv — it already contains all joins for delivered orders"
+  },
+
+  "canonical_metrics": {
+    "total_revenue": {
+      "formula": "SUM(payment_value) from payments table, joined to orders, filtered to order_status = 'delivered'",
+      "shortcut": "SUM(total_payment_value) from olist_master.csv",
+      "unit": "BRL",
+      "do_not_use": "SUM(price) from order_items — this is item-level only, misses vouchers and multi-payment orders"
+    },
+    "avg_order_value": {
+      "formula": "SUM(total_payment_value) / COUNT(DISTINCT order_id)",
+      "unit": "BRL"
+    },
+    "total_unique_customers": {
+      "formula": "COUNT(DISTINCT customer_unique_id)",
+      "do_not_use": "COUNT(DISTINCT customer_id) — inflated"
+    },
+    "repeat_purchase_rate": {
+      "formula": "COUNT(customers with more than 1 order) / COUNT(DISTINCT customer_unique_id) * 100",
+      "unit": "%",
+      "context": "Olist baseline is approximately 3% — critically low, major strategic finding"
+    },
+    "on_time_delivery_rate": {
+      "formula": "COUNT(orders where order_delivered_customer_date <= order_estimated_delivery_date) / COUNT(total delivered orders) * 100",
+      "shortcut": "1 - AVG(is_late) * 100 from olist_master.csv",
+      "unit": "%",
+      "benchmark": "90% industry standard — flag if below this"
+    },
+    "avg_delivery_days": {
+      "formula": "AVG(order_delivered_customer_date - order_purchase_timestamp) in days",
+      "shortcut": "AVG(delivery_days) from olist_master.csv"
+    },
+    "avg_review_score": {
+      "formula": "AVG(review_score) from reviews table",
+      "unit": "1-5 scale",
+      "benchmark": "4.0 is healthy marketplace threshold — flag if below this"
+    },
+    "negative_review_rate": {
+      "formula": "COUNT(review_score <= 2) / COUNT(total reviews) * 100",
+      "unit": "%"
+    },
+    "revenue_by_category": {
+      "formula": "SUM(price) from order_items, joined to products for category_english",
+      "note": "Use price here (item level) not payment_value — this is category attribution not total revenue"
+    }
+  },
+
+  "common_questions_and_how_to_answer_them": {
+    "What is total revenue?": "SUM(total_payment_value) from olist_master.csv",
+    "How many customers do we have?": "COUNT(DISTINCT customer_unique_id) from olist_master.csv",
+    "What is the repeat rate?": "COUNT customers with order_count > 1 / total unique customers from entity_behaviour analysis",
+    "Which state has most revenue?": "GROUP BY customer_state, SUM(total_payment_value) from olist_master.csv",
+    "Are deliveries on time?": "AVG(is_late) from olist_master.csv — 0 = on time, 1 = late",
+    "What is the average review score?": "AVG(review_score) from olist_master.csv",
+    "Which category sells most?": "JOIN order_items to products_clean on product_id, GROUP BY category_english, SUM(price)",
+    "How long does delivery take?": "AVG(delivery_days) from olist_master.csv, optionally GROUP BY customer_state"
+  }
+}

@@ -1,5 +1,5 @@
 # PHASE 3 — EXPLORATORY DATA ANALYSIS (EDA)
-# All prompts use olist_master.csv from 02_Cleaned_Data
+# All prompts use olist_master.csv from 02_Cleaned_data
 # Run prompts in order. Save every output before moving on.
 # ============================================================
 
@@ -8,7 +8,7 @@
 ## PROMPT 3.1 — First look at the master dataset
 
 ```
-Load 02_Cleaned_Data/olist_master.csv
+Load 02_Cleaned_data/olist_master.csv
 
 Give me a complete first-look summary:
 1. Total number of orders, total revenue, date range of the data
@@ -22,7 +22,7 @@ Give me a complete first-look summary:
 
 Present this as an executive snapshot — 8 numbers, clean labels, no code.
 This is the first slide of the dashboard.
-Save to 07_AI_Outputs/eda_01_executive_snapshot.md
+Save to 06_AI/Outputs/Generated_Insights/eda_01_executive_snapshot.md
 ```
 
 ---
@@ -47,8 +47,8 @@ Using olist_master.csv, analyse revenue and order volume over time.
 
 4. Explain in plain English what the trend tells us about the business
 
-Save the table to 07_AI_Outputs/eda_02_revenue_over_time.csv
-Save the written analysis to 07_AI_Outputs/eda_02_revenue_analysis.md
+Save the table to 06_AI/Outputs/Generated_Insights/eda_02_revenue_over_time.csv
+Save the written analysis to 06_AI/Outputs/Generated_Insights/eda_02_revenue_analysis.md
 ```
 
 ---
@@ -58,8 +58,8 @@ Save the written analysis to 07_AI_Outputs/eda_02_revenue_analysis.md
 ```
 Using olist_master.csv, analyse revenue by product category.
 
-For this we need to join with 02_Cleaned_Data/orders_items_aggregated.csv
-and 02_Cleaned_Data/products_clean.csv to get category_english.
+For this we need to join with 02_Cleaned_data/orders_items_aggregated.csv
+and 02_Cleaned_data/products_clean.csv to get category_english.
 
 1. Calculate total revenue per category_english (SUM of price from order_items)
 2. Calculate order count per category
@@ -73,7 +73,7 @@ Tell me:
 - Which categories have high order volume but low revenue (potential pricing issue)?
 - Which categories have low volume but high average price (niche opportunities)?
 
-Save to 07_AI_Outputs/eda_03_revenue_by_category.csv and eda_03_category_analysis.md
+Save to 06_AI/Outputs/Generated_Insights/eda_03_revenue_by_category.csv and eda_03_category_analysis.md
 ```
 
 ---
@@ -106,7 +106,7 @@ Tell me in plain English:
 - Where are the growth opportunities?
 - What is the geographic risk if São Paulo has a logistics disruption?
 
-Save to 07_AI_Outputs/eda_04_customer_geography.csv and eda_04_geography_analysis.md
+Save to 06_AI/Outputs/Generated_Insights/eda_04_customer_geography.csv and eda_04_geography_analysis.md
 ```
 
 ---
@@ -137,7 +137,7 @@ Tell me:
 - What does the repeat rate tell us about customer loyalty?
 - What would revenue look like if the repeat rate doubled from current level?
 
-Save to 07_AI_Outputs/eda_05_customer_behaviour.csv and eda_05_customer_analysis.md
+Save to 06_AI/Outputs/Generated_Insights/eda_05_customer_behaviour.csv and eda_05_customer_analysis.md
 ```
 
 ---
@@ -171,7 +171,7 @@ Using olist_master.csv, analyse delivery performance.
 
 Tell me in plain English where the logistics problem is and who it affects most.
 
-Save to 07_AI_Outputs/eda_06_delivery_performance.csv and eda_06_delivery_analysis.md
+Save to 06_AI/Outputs/Generated_Insights/eda_06_delivery_performance.csv and eda_06_delivery_analysis.md
 ```
 
 ---
@@ -204,7 +204,7 @@ Tell me:
 - What is the single biggest driver of low review scores?
 - What score improvement could we expect if the on-time rate reached 95%?
 
-Save to 07_AI_Outputs/eda_07_satisfaction_analysis.csv and eda_07_satisfaction_analysis.md
+Save to 06_AI/Outputs/Generated_Insights/eda_07_satisfaction_analysis.csv and eda_07_satisfaction_analysis.md
 ```
 
 ---
@@ -212,7 +212,7 @@ Save to 07_AI_Outputs/eda_07_satisfaction_analysis.csv and eda_07_satisfaction_a
 ## PROMPT 3.8 — Seller performance analysis
 
 ```
-Using 02_Cleaned_Data/orders_items_aggregated.csv joined with sellers_dataset.csv
+Using 02_Cleaned_data/orders_items_aggregated.csv joined with sellers_dataset.csv
 and olist_master.csv, analyse seller performance.
 
 1. For each seller_id calculate:
@@ -236,7 +236,7 @@ Tell me:
 - What % of total revenue comes from the top 10% of sellers?
 - How many sellers should be flagged for review based on quality metrics?
 
-Save to 07_AI_Outputs/eda_08_seller_performance.csv and eda_08_seller_analysis.md
+Save to 06_AI/Outputs/Generated_Insights/eda_08_seller_performance.csv and eda_08_seller_analysis.md
 ```
 
 ---
@@ -246,7 +246,7 @@ Save to 07_AI_Outputs/eda_08_seller_performance.csv and eda_08_seller_analysis.m
 ```
 Generate a complete EDA summary for the Olist project.
 
-Read all files in 07_AI_Outputs/ that start with eda_
+Read all files in 06_AI/Outputs/Generated_Insights/ that start with eda_
 
 Compile a single summary document that contains:
 
@@ -270,6 +270,6 @@ Compile a single summary document that contains:
 4. WHAT WE STILL DON'T KNOW
    List 2–3 questions the data raises but cannot fully answer
 
-Save to 07_AI_Outputs/eda_COMPLETE_SUMMARY.md
+Save to 06_AI/Outputs/Generated_Insights/eda_COMPLETE_SUMMARY.md
 This document becomes the foundation for the storytelling phase.
 ```

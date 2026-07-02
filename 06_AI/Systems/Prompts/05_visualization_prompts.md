@@ -13,7 +13,7 @@
 ## PROMPT 5.1 — Revenue trend chart (Python)
 
 ```
-Using 02_Cleaned_Data/kpi_tables/kpi_revenue_monthly.csv,
+Using 02_Cleaned_data/kpi_tables/kpi_revenue_monthly.csv,
 create a professional revenue trend chart in Python.
 
 Chart type: Line chart with bar chart overlay
@@ -27,7 +27,7 @@ Chart type: Line chart with bar chart overlay
 
 Use matplotlib or plotly. Use plotly if possible — it's interactive.
 Generate complete runnable code.
-Save the chart to 07_AI_Outputs/charts/chart_01_revenue_trend.html (if plotly)
+Save the chart to 06_AI/Outputs/Generated_Charts/chart_01_revenue_trend.html (if plotly)
 or chart_01_revenue_trend.png (if matplotlib)
 ```
 
@@ -36,7 +36,7 @@ or chart_01_revenue_trend.png (if matplotlib)
 ## PROMPT 5.2 — Category revenue bar chart (Python)
 
 ```
-Using 02_Cleaned_Data/kpi_tables/kpi_revenue_by_category.csv,
+Using 02_Cleaned_data/kpi_tables/kpi_revenue_by_category.csv,
 create a horizontal bar chart of revenue by category.
 
 - Show top 15 categories only
@@ -49,7 +49,7 @@ create a horizontal bar chart of revenue by category.
 - Keep it clean: no chart border, minimal axes
 
 Generate complete runnable code.
-Save to 07_AI_Outputs/charts/chart_02_revenue_by_category.html
+Save to 06_AI/Outputs/Generated_Charts/chart_02_revenue_by_category.html
 ```
 
 ---
@@ -57,7 +57,7 @@ Save to 07_AI_Outputs/charts/chart_02_revenue_by_category.html
 ## PROMPT 5.3 — Delivery performance by state (Python)
 
 ```
-Using 02_Cleaned_Data/kpi_tables/kpi_delivery_by_state.csv,
+Using 02_Cleaned_data/kpi_tables/kpi_delivery_by_state.csv,
 create two side-by-side charts:
 
 Chart A — Horizontal bar chart:
@@ -76,7 +76,7 @@ Place both charts side by side in one figure.
 Add a shared subtitle: "States ranked by delivery performance — Olist 2016–2018"
 
 Generate complete runnable code.
-Save to 07_AI_Outputs/charts/chart_03_delivery_by_state.html
+Save to 06_AI/Outputs/Generated_Charts/chart_03_delivery_by_state.html
 ```
 
 ---
@@ -98,7 +98,7 @@ between delivery time and review score.
 - Subtitle: "Each dot = one order. Line shows the average trend."
 
 Generate complete runnable code.
-Save to 07_AI_Outputs/charts/chart_04_delivery_vs_satisfaction.html
+Save to 06_AI/Outputs/Generated_Charts/chart_04_delivery_vs_satisfaction.html
 ```
 
 ---
@@ -106,7 +106,7 @@ Save to 07_AI_Outputs/charts/chart_04_delivery_vs_satisfaction.html
 ## PROMPT 5.5 — Customer geography heatmap (Python)
 
 ```
-Using 02_Cleaned_Data/kpi_tables/kpi_delivery_by_state.csv and
+Using 02_Cleaned_data/kpi_tables/kpi_delivery_by_state.csv and
 the revenue by state data from the EDA, create a Brazil state heatmap.
 
 Use plotly choropleth with Brazil state boundaries (geojson).
@@ -124,7 +124,7 @@ For each map:
 - Title each map clearly
 
 Generate complete runnable code.
-Save to 07_AI_Outputs/charts/chart_05_brazil_heatmap.html
+Save to 06_AI/Outputs/Generated_Charts/chart_05_brazil_heatmap.html
 ```
 
 ---
@@ -132,7 +132,7 @@ Save to 07_AI_Outputs/charts/chart_05_brazil_heatmap.html
 ## PROMPT 5.6 — Review score distribution (Python)
 
 ```
-Using 02_Cleaned_Data/kpi_tables/kpi_satisfaction_monthly.csv
+Using 02_Cleaned_data/kpi_tables/kpi_satisfaction_monthly.csv
 and the overall satisfaction summary, create two charts:
 
 Chart A — Donut chart:
@@ -151,7 +151,7 @@ Chart B — Line chart (monthly trend):
 
 Place both charts in one layout.
 Generate complete runnable code.
-Save to 07_AI_Outputs/charts/chart_06_satisfaction_overview.html
+Save to 06_AI/Outputs/Generated_Charts/chart_06_satisfaction_overview.html
 ```
 
 ---
@@ -167,7 +167,7 @@ Save to 07_AI_Outputs/charts/chart_06_satisfaction_overview.html
 
 ```
 I am building a Power BI dashboard for the Olist project.
-My data files are all in 02_Cleaned_Data/kpi_tables/
+My data files are all in 02_Cleaned_data/kpi_tables/
 
 Guide me through connecting Power BI to these files:
 1. How to connect Power BI to a folder of CSV files

@@ -1,6 +1,6 @@
 # PHASE 4 — KPI CALCULATION & DATA MODEL
 # These prompts build the final KPI tables that feed your Power BI dashboard.
-# All outputs go to 02_Cleaned_Data/kpi_tables/ — Power BI connects to this folder.
+# All outputs go to 02_Cleaned_data/kpi_tables/ — Power BI connects to this folder.
 # ============================================================
 
 ---
@@ -8,7 +8,7 @@
 ## PROMPT 4.0 — Create KPI output folder
 
 ```
-Create the folder 02_Cleaned_Data/kpi_tables/
+Create the folder 02_Cleaned_data/kpi_tables/
 This is where all KPI output files will be saved.
 Confirm the folder exists and is empty.
 ```
@@ -38,8 +38,8 @@ Also calculate these overall totals (put in a separate single-row summary table)
 - worst_revenue_month
 - revenue_growth_rate (% change from first full month to last full month)
 
-Save monthly table to 02_Cleaned_Data/kpi_tables/kpi_revenue_monthly.csv
-Save summary table to 02_Cleaned_Data/kpi_tables/kpi_revenue_summary.csv
+Save monthly table to 02_Cleaned_data/kpi_tables/kpi_revenue_monthly.csv
+Save summary table to 02_Cleaned_data/kpi_tables/kpi_revenue_summary.csv
 
 Tell me: is the business growing, flat, or declining? Give me one sentence.
 ```
@@ -230,7 +230,7 @@ SATISFACTION
 - lateness_score_penalty (stars lost due to late delivery)
 - worst_satisfaction_category
 
-Save to 02_Cleaned_Data/kpi_tables/KPI_MASTER_DASHBOARD.csv
+Save to 02_Cleaned_data/kpi_tables/KPI_MASTER_DASHBOARD.csv
 
 This file is the "single source of truth" for all headline numbers.
 Any time a number appears on the dashboard, it traces back to this file.

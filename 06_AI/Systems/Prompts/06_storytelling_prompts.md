@@ -1,6 +1,6 @@
 # PHASE 6 — STORYTELLING & RECOMMENDATIONS
 # This phase turns your analysis into a client deliverable.
-# Input: 07_AI_Outputs/eda_COMPLETE_SUMMARY.md + all kpi_tables/
+# Input: 06_AI/Outputs/Generated_Insights/eda_COMPLETE_SUMMARY.md + all kpi_tables/
 # Output: executive presentation narrative + written recommendations report
 # ============================================================
 
@@ -9,8 +9,8 @@
 ## PROMPT 6.1 — Build the narrative arc
 
 ```
-Read 07_AI_Outputs/eda_COMPLETE_SUMMARY.md and the KPI master dashboard file
-at 02_Cleaned_Data/kpi_tables/KPI_MASTER_DASHBOARD.csv
+Read 06_AI/Outputs/Generated_Insights/eda_COMPLETE_SUMMARY.md and the KPI master dashboard file
+at 02_Cleaned_data/kpi_tables/KPI_MASTER_DASHBOARD.csv
 
 I need to present this analysis to a business executive.
 The presentation has 10 minutes. Build the narrative arc.
@@ -40,7 +40,7 @@ within 2 quarters."
 
 Write this in clean, confident business English.
 No jargon. No hedging. No "it appears that."
-Save to 07_AI_Outputs/storytelling_narrative_arc.md
+Save to 06_AI/Outputs/Generated_Docs/storytelling_narrative_arc.md
 ```
 
 ---
@@ -48,7 +48,7 @@ Save to 07_AI_Outputs/storytelling_narrative_arc.md
 ## PROMPT 6.2 — Executive summary (1 page)
 
 ```
-Using 07_AI_Outputs/eda_COMPLETE_SUMMARY.md and KPI_MASTER_DASHBOARD.csv,
+Using 06_AI/Outputs/Generated_Insights/eda_COMPLETE_SUMMARY.md and KPI_MASTER_DASHBOARD.csv,
 write a one-page executive summary for the Olist analysis.
 
 Format:
@@ -80,7 +80,7 @@ RISK FLAGS (2 bullet points):
 • [A data limitation the client should know about]
 
 Write this in formal business English. Every sentence must be backed by a number from the data.
-Save to 06_Reports/olist_executive_summary.md
+Save to 07_Reports/olist_executive_summary.md
 ```
 
 ---
@@ -122,7 +122,7 @@ Close with a clear call to action — what decision does the executive need to m
 
 For each slide: write exact words to say, not bullet points.
 This is the script — it should sound natural spoken aloud, not read like a report.
-Save to 07_AI_Outputs/presentation_script.md
+Save to 06_AI/Outputs/Generated_Docs/presentation_script.md
 ```
 
 ---
@@ -173,7 +173,7 @@ Structure:
 
 Use formal but clear business English.
 No statistics jargon. Every claim must cite a specific number.
-Save to 06_Reports/olist_recommendations_report.md
+Save to 07_Reports/olist_recommendations_report.md
 This is the client deliverable.
 ```
 
@@ -203,7 +203,7 @@ Questions to prepare for:
 9. "How does this compare to our competitors?"
 10. "What would you need to do a deeper analysis?"
 
-Save to 07_AI_Outputs/qa_talking_points.md
+Save to 06_AI/Outputs/Generated_Docs/qa_talking_points.md
 ```
 
 ---
@@ -215,11 +215,12 @@ Generate a final project deliverables checklist for the Olist project.
 
 List every file that should exist in the project at completion.
 Check each folder:
-- 02_Cleaned_Data/ — list expected files
-- 02_Cleaned_Data/kpi_tables/ — list expected files
-- 07_AI_Outputs/ — list expected files
-- 07_AI_Outputs/charts/ — list expected charts
-- 06_Reports/ — list expected reports
+- 02_Cleaned_data/ — list expected files
+- 02_Cleaned_data/kpi_tables/ — list expected files
+- 06_AI/Outputs/Generated_Docs/ — list expected doc files
+- 06_AI/Outputs/Generated_Insights/ — list expected insight files
+- 06_AI/Outputs/Generated_Charts/ — list expected charts
+- 07_Reports/ — list expected reports
 
 For each file: file name, what it contains, which phase produced it, status (exists / missing).
 
@@ -232,5 +233,5 @@ Then generate a project completion scorecard:
 - Overall: X% complete
 
 If any files are missing, tell me which prompts to re-run to generate them.
-Save to 07_AI_Outputs/project_completion_checklist.md
+Save to 06_AI/Outputs/Generated_Docs/project_completion_checklist.md
 ```

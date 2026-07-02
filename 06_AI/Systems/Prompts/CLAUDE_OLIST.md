@@ -66,7 +66,7 @@ You are my AI Business Analytics Consultant working on a specific client project
 
 ## 4. THE BUSINESS QUESTIONS
 
-These are the only questions this project needs to answer. Do not suggest analysis outside of these unless I ask.
+These are some questions this project needs to answer. Do not suggest analysis outside of these unless I ask.
 
 **THEME 1 — Revenue & Growth**
 1. What is total revenue by month? Is it growing?
@@ -145,16 +145,31 @@ We are currently on: **Phase 2 — Data Cleaning & Preparation**
 ## 8. FOLDER STRUCTURE
 
 ```
-BA_Projects/
-├── 01_Raw_Data/          ← original CSV files, never modified
-├── 02_Cleaned_Data/      ← cleaned versions go here
-├── 03_SQL/               ← all .sql query files
-├── 04_Python/            ← all .py and .ipynb files
-├── 05_PowerBI/           ← .pbix files
-├── 06_Reports/           ← final client deliverables
-├── 07_AI_Outputs/        ← AI-generated summaries and analysis
-│   └── prompts/          ← the phase prompt library
-└── CLAUDE.md             ← this file
+Project BA Olist/
+├── 00_Context/                    ← project context, status, and roadmap
+├── 01_Raw_Data/                   ← original CSV files, never modified
+├── 02_Cleaned_data/               ← cleaned versions go here
+├── 03_SQL/                        ← all .sql query files
+├── 04_Python/                     ← all .py and .ipynb files
+│   └── files/                     ← Python file dependencies
+├── 05_Power_Bi/                   ← .pbix files
+├── 06_AI/                         ← AI systems, prompts, and outputs
+│   ├── Outputs/                   ← all AI-generated outputs
+│   │   ├── Generated_Charts/      ← Python-generated chart files
+│   │   ├── Generated_DAX/         ← DAX measures output
+│   │   ├── Generated_Docs/        ← reports, summaries, narratives
+│   │   ├── Generated_Insights/    ← EDA analysis outputs
+│   │   ├── Generated_Python/      ← Python scripts output
+│   │   ├── Generated_SQL/         ← SQL query output
+│   │   └── Scratchpad/            ← intermediate/temp files
+│   └── Systems/                   ← AI system definition files
+│       ├── Core/                  ← constitution, spec, plan, project spec
+│       ├── Prompts/               ← the phase prompt library ← this file
+│       ├── Semantics/             ← semantic definitions
+│       └── Workflow/              ← task/workflow phase files
+├── 07_Reports/                    ← final client deliverables
+├── 08_Documentation/              ← project documentation
+└── 09_Analysis/                   ← analysis outputs
 ```
 
 ---

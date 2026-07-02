@@ -20,7 +20,7 @@ For each file report:
 
 Format the output as a clean summary table.
 Do not fix anything yet — just report what you find.
-Save the report to 07_AI_Outputs/cleaning_audit.md
+Save the report to 06_AI/Outputs/Generated_Docs/cleaning_audit.md
 ```
 
 ---
@@ -31,19 +31,19 @@ Save the report to 07_AI_Outputs/cleaning_audit.md
 Clean the olist_orders_dataset.csv file. Follow these steps exactly:
 
 1. Show me the count of each value in order_status before we do anything
-2. Filter to only orders where order_status = 'delivered' — save this as a separate file called orders_delivered.csv in 02_Cleaned_Data
+2. Filter to only orders where order_status = 'delivered' — save this as a separate file called orders_delivered.csv in 02_Cleaned_data
 3. Check the 4 date columns for nulls:
    - order_purchase_timestamp
    - order_approved_at
    - order_delivered_carrier_date
    - order_delivered_customer_date
    Show me the null count for each
-4. For delivered orders: flag any row where order_delivered_customer_date is null — save flagged rows to 07_AI_Outputs/orders_delivery_date_missing.csv
+4. For delivered orders: flag any row where order_delivered_customer_date is null — save flagged rows to 06_AI/Outputs/Scratchpad/orders_delivery_date_missing.csv
 5. Calculate delivery_days = order_delivered_customer_date minus order_purchase_timestamp (in days)
 6. Flag any delivery_days values below 0 or above 180 as outliers
 7. Show me a summary: total delivered orders, orders with complete dates, orders flagged
 
-Save the cleaned delivered orders (no nulls in dates, no outlier flags) to 02_Cleaned_Data/orders_clean.csv
+Save the cleaned delivered orders (no nulls in dates, no outlier flags) to 02_Cleaned_data/orders_clean.csv
 Tell me in plain English what was removed and why.
 ```
 
@@ -64,7 +64,7 @@ Clean the olist_order_payments_dataset.csv file.
    - payment_installments_max = highest installments value for that order
 6. Confirm the row count of the aggregated table matches the number of unique order_ids
 
-Save to 02_Cleaned_Data/payments_clean.csv
+Save to 02_Cleaned_data/payments_clean.csv
 Explain what aggregating payments means for the analysis.
 ```
 
@@ -88,7 +88,7 @@ Clean the olist_order_items_dataset.csv file.
       - seller_ids = list of unique seller_ids in the order
       - product_ids = list of product_ids in the order
 
-Save both to 02_Cleaned_Data/
+Save both to 02_Cleaned_data/
 Tell me: what % of orders contain more than one item?
 ```
 
@@ -107,7 +107,7 @@ Clean the olist_products_dataset.csv file.
 6. Show me the top 20 categories by product count after translation
 7. Check for nulls in product dimensions (length, height, width, weight) — show counts
 
-Save to 02_Cleaned_Data/products_clean.csv
+Save to 02_Cleaned_data/products_clean.csv
 Tell me: how many unique categories exist after translation?
 ```
 
@@ -128,7 +128,7 @@ Clean the olist_order_reviews_dataset.csv file.
    - review_comment_message (keep even if null)
    - review_creation_date
 
-Save to 02_Cleaned_Data/reviews_clean.csv
+Save to 02_Cleaned_data/reviews_clean.csv
 Tell me the overall average review score.
 ```
 
@@ -151,7 +151,7 @@ We need one GPS coordinate per zip code.
    Flag any rows outside these bounds
 5. Remove flagged rows
 
-Save to 02_Cleaned_Data/geolocation_clean.csv
+Save to 02_Cleaned_data/geolocation_clean.csv
 Tell me how many zip codes we have after cleaning.
 ```
 
@@ -181,7 +181,7 @@ Show me:
 - Count of nulls per column in the final table
 - % of orders that are late
 
-Save to 02_Cleaned_Data/olist_master.csv
+Save to 02_Cleaned_data/olist_master.csv
 This is the file we use for all analysis from Phase 3 onward.
 ```
 
@@ -201,5 +201,5 @@ The report should contain:
 6. A 3-sentence plain English summary suitable for a client status update
 
 Format it as a clean markdown document.
-Save to 07_AI_Outputs/cleaning_summary_report.md
+Save to 06_AI/Outputs/Generated_Docs/cleaning_summary_report.md
 ```
