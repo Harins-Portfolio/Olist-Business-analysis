@@ -1,0 +1,44 @@
+# ---------- SECRETS (never commit) ----------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets.*
+config.local.*
+
+# ---------- Generated / cleaned data (reproducible) ----------
+02_Cleaned_data/*
+!02_Cleaned_data/README.md
+
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.python-version
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+.mypy_cache/
+
+# ---------- Power BI ----------
+05_Power_Bi/*.pbix
+*.pbix
+*.pbit
+
+# ---------- AI scratchpad / temp outputs ----------
+06_AI/Outputs/Scratchpad/*
+!06_AI/Outputs/Scratchpad/.gitkeep
+
+# ---------- OS ----------
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# ---------- Editors ----------
+.vscode/
+.idea/
+*.suo
+*.user

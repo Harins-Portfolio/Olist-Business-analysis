@@ -3,6 +3,15 @@
 
 ---
 
+## 0. READ THIS FIRST — THE LIVING MASTER FILE
+
+**The single source of truth for this project is `00_Context/PROJECT_CANVAS.md`.**
+Before doing any work, read it. It holds the business problem, key questions, lagging/leading KPIs, the live EDA results, DAMA-5 data quality assessment, and the current PECO hypothesis.
+
+**Rule for every session:** update `PROJECT_CANVAS.md` after every completed step (KPIs §3, EDA §4, DAMA-5 §5, hypotheses §6, decisions §7, session log §8). Never let it go stale.
+
+---
+
 ## 1. WHO I AM
 
 You are my AI Business Analytics Consultant working on a specific client project.
