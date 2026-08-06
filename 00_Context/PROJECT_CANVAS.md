@@ -6,7 +6,8 @@
 - **Last updated:** 2026-08-06
 - **Owned by:** Nikhil Harins (Business Analyst) + AI Consultant
 - **Project slug:** `olist`
-- **Status:** Phase 1 complete → **Phase 2 (Data Cleaning) starting** · Post-logo
+- **Status:** Phase 1 complete → **Phase 2/3 — Full EDA complete** (delivered-order view) → cleaning + KPI formalisation next
+- **Evidence source:** `04_Python/olist_eda.ipynb` (executed) → `06_AI/Outputs/Generated_Insights/eda_summary.json`
 - **Source of truth that generates this:** `06_AI/Systems/Core/CLAUDE_OLIST.md` + `spec.md`
 
 ---
@@ -58,77 +59,72 @@ An executive dashboard + written recommendations that tell leadership **exactly 
 ## 3. KPIs — LAGGING & LEADING
 
 ### LAGGING KPIs (outcome / past results — what we are improving)
-| KPI | Current baseline (AUG 2026 seed) | Target / Note |
-|---|---|---|
-| Total revenue | R$ 13,221,498 (delivered) | Recovering trend, not fixed target |
-| Average order value (AOV) | R$ 137.04 | Rises over time |
-| Monthly order volume | ~6k–7.3k (peak Nov-2017=7,289) | Should be growing |
-| Repeat customer rate | **3.12%** ❌ (flagged problem) | Olist baseline ~3% → goal lift |
-| Average review score | 4.16 (delivered) | Healthy >4.1 |
+| KPI | Current baseline (**EDA 2026-08-06**) | Trend read | Target / Note |
+|---|---|---|---|
+| Total revenue | R$ 13,221,498 (delivered) | Growing, ~R$ 850–990k/mo mature | Track trend, no fixed target |
+| Average order value (AOV) | **R$ 137.04** (median R$ 86.6) | **Flat–slightly declining** (2017: 138.95 → 2018: 136.80) | AOV is NOT rising — challenge |
+| Monthly order volume | ~6.1k–7.3k/mo (peak Nov-2017 7,289) | +5%/mo median volume growth | Should keep growing |
+| Repeat customer rate | **3.12%** ❌ (2,997 of 96,096 repeat) | **Critical failure — flat & tiny** | ~0.26% buy ≥3×; goal lift |
+| Average review score | **4.16** (delivered) | Stable | Healthy >4.1 |
 
 ### LEADING KPIs (inputs / early-warning — what drives the outcomes)
-| KPI leading (works across one) | Note |
-|---|---|
-| Delivery time (days) → measured 12.1 mean / 10 median | Leading indicator of satisfaction & retention |
-| On-time delivery rate (delivered ≤ expected) | Leading indicator of review score |
-| Payment installment levels (mean 2.85) | Leading indicator of AOV & credit risk |
-| Category mix concentration (top=health_beauty) | Leading of revenue growth |
-| Seller concentration (median seller revenue R$ 846) | Leading indicator of supply robustness |
+| Leading KPI | Measured value | Why it matters |
+|---|---|---|
+| On-time delivery rate | **91.9%** (8,644 on-time of 96,470) | Strongest lever on satisfaction (r = −0.30) |
+| Delivery time (days) | mean 12.1 / median 10 | 95.7% within 30d; drives score drop >22d |
+| Freight burden | R$ 2.20M = **16.6% of revenue** | Hits satisfaction (score −0.13 w/ freight) |
+| Payment instalments | 63.1% of revenue via >1 instalment (mean 2.85) | Credit-heavy mix; AOV & bad-debt signal |
+| Category concentration | top 5 = 39.7% of revenue | Revenue growth depends on few categories |
+| Seller concentration | top 1% = 25.5% of revenue; top 20% = 82.3% | **Single-point supply risk** |
 
-**Rule:** Never compute lagging without its matching leading indicators, or we cannot act.
+**Rule:** Never compute lagging without its matching leading indicators, or we cannot act. **Biggest gap to close = repeat rate (3.12%).**
 
 ---
 
-## 4. FULL EDA RESULTS (baseline snapshot — 2026-08-06)
+## 4. FULL EDA RESULTS (deep EDA executed `04_Python/olist_eda.ipynb`, 2026-08-06)
 
-> Method: all delivered orders (`order_status=delivered`), joined to items/payments/reviews; customers via `customer_unique_id`. Update each EDA step in Phase 3.
+> Method: all analysis on **delivered orders only** (96,478 of 99,441), joined across orders/items/payments/reviews/customers/sellers/products. Numbers from "my merchant file" totals exclude non-delivered orders. Reproducible in `olist_eda.ipynb`.
+
+### 4.0 THE ONE-LINE SUMMARY
+> *"Olist is growing and healthy-satisfying, with two deep problems: it can't get customers to buy a second time (3.12% repeat), and delivery lateness destroys satisfaction (score 2.57 late vs 4.29 on-time) — likely one shared root cause."*
 
 ### 4.1 Scale & money
-- Total gross revenue (delivered): **R$ 13,221,498**
-- Delivered orders: **96,478**
-- Average order value: **R$ 137.04**
-- Repeat customer rate: **3.12%** (only 96,096 unique customers → retention is the core problem)
-- Payment installments mean: **2.85**
+- Gross revenue (delivered): **R$ 13,221,498**
+- Delivered orders: **96,478** · AOV **R$ 137.04** (median **R$ 86.58**)
+- Freight revenue: **R$ 2,198,276 = 16.6% of total revenue**
+- Unique customers: **96,596** · repeat rate **3.12%** (2,997 repeat; **only 252 buy ≥3× = 0.26%**)
 
-### 4.2 Growth narrative
-- Peak months: Nov-2017 (7,289), Jan-2018 (7,069), Mar-2018 (7,003)
-- Stable high end: Jun–Aug 2018 (~6.1k–6.4k orders/mo, ~R$ 838k–868k rev/mo)
-- Earliest history thin (Sep 2016 = 1 order, Oct 2016 = 265) → start of keep → growth is real but data trail short at the very start.
+### 4.2 Growth & seasonality
+- **Market is growing**: volume median +5.0%/mo, revenue median +8.1%/mo; mature months R$ 838k–988k.
+- **AOV is FLAT, not rising**: 2017 avg R$ 138.95 → 2018 R$ 136.80. Growth = volume, not value.
+- **Black Friday spike**: Nov-2017 = 7,289 orders (**+81% vs monthly avg**), R$ 987,765 — biggest single revenue month. Dec-2017 Christmas (5,513 orders).
+- Weekday vs weekend: 74,288 wkday vs 22,190 weekend orders; AOV near-equal (R$ 137 vs R$ 140).
 
-### 4.3 Delivery / operations
-- Mean delivery days: **12.1** · median **10**
-- Worst states for delivery time: **RR 29.0d, AP 26.7d, AM 26.0d, AL 24.0d, PA 23.3d** (all North/Northeast)
-- Best states (not shown) are SP/MG/RS
+### 4.3 Delivery, payments & freight (the operational drag)
+- Mean delivery **12.1 days**, median 10 (25th=6, 75th=15, 90th=23, 95th=29, 99th=46).
+- **On-time rate 91.9%** → 7,826 late orders (8.1%).
+- Speed windows: **34.9% ≤7d · 72.7% ≤14d · 95.7% ≤30d** → the tail 15–30d is the squeeze.
+- Payments (delivered): credit_card **R$ 12.1M (78.5%)**, boleto R$ 2.77M (17.9%), debit R$ 0.21M, voucher R$ 0.34M. **63.1% of revenue pays in >1 instalment** (mean 2.85).
+- **Freight = 16.6% of revenue** (the customer-carried logistics cost).
 
-### 4.4 Payments
-| type | orders | value |
-|---|---|---|
-| credit_card | 74,304 | R$ 12,101,095 |
-| boleto | 19,191 | R$ 2,769,933 |
-| voucher | 3,679 | R$ 343,014 |
-| debit_card | 1,485 | R$ 208,421 |
+### 4.4 Satisfaction (the quality picture)
+- Average review score **4.16** (delivered); **78.9% rate 4–5★**, **12.8% rate 1–2★** (a thick dissatisfaction tail).
+- Score mix: 1★=9,406 · 2★=2,941 · 3★=7,961 · 4★=18,987 · 5★=57,066.
 
-### 4.5 Reviews & satisfaction
-- Mean review score: **4.16** (delivered orders)
-- Distribution: 1★=9,406 · 2★=2,941 · 3★=7,961 · 4★=18,987 · 5★=57,066
-- **KEY BUSINESS INSIGHT: On-time orders score 4.29 vs LATE orders score 2.57** → a 1.7-point satisfaction gap directly linked to delivery lateness.
+### 4.5 THE DELIVERY→SATISFACTION EFFECT (validated by EDA)
+- **On-time orders score 4.29 vs LATE orders 2.57 → 1.73-point gap** (t=89.6, p<0.001, significant).
+- Score decays with wait: **≤7d 4.41 → 8–14d 4.29 → 15–21d 4.10 → 22–30d 3.49 → 31–60d 2.18 → 60d+ 2.18**. Satisfaction collapses at ~3 weeks.
+- **delivery_days vs score r = −0.30** (the dominant driver); freight vs score −0.13.
 
-### 4.6 Top categories (revenue)
-| category | orders | revenue |
-|---|---|---|
-| health_beauty | 8,836 | R$ 1,258,681 |
-| watches_gifts | 5,624 | R$ 1,205,006 |
-| bed_bath_table | 9,417 | R$ 1,036,988 |
-| sports_leisure | 7,720 | R$ 988,049 |
-| computers_accessories | 6,689 | R$ 911,954 |
-| *(uncategorized, labelled, kept)* | — | R$ 185,050 |
+### 4.6 Geography — Southeast dependence, North/Northeast problems
+- Customer revenue: **SP 38.3%** → RJ 13.8% → MG 12.0% (**top3 = 63.4%**).
+- **Sellers are even more concentrated: SP = 64.6% of seller revenue.**
+- Slowest states (avg days): RR 28.0, AM 26.0, AL 24.0, PA 23.3, MA 21.2 — all North/Northeast.
+- Worst on-time %: AL 76%, MA 80%, SE 84%, CE 84%, PI 85%.
+- **Lowest review states**: MA 3.77, AL 3.82, PA 3.84, BA 3.86, CE 3.87 — *the states with worst delivery are the states with worst satisfaction — the two problems compound.*
+- Fastest/impact state SP: **8.26 days, score 4.18**, 44,441 delivered orders.
 
-### 4.7 Sellers
-- Active sellers (delivered): **2,970**
-- Seller median revenue: **R$ 846** → very long tail, few big sellers
-- Top states by customer revenue: **SP (R$ 5.2M), RJ (R$ 1.8M), MG (R$ 1.6M)**
-
-> ⚠️ Full gap-trend month-over-month, top-10 category runs, and inter-state review breakdown are **Phase 3 scope** — update §5 here with deeper EDA.
+> ⚠️ gap-hour-to-month trend, top-10 category runs, seller-review interaction, and inter-state deep review breakdown = **Phase 3 scope**.
 
 ---
 
@@ -160,38 +156,48 @@ Dimensions assessed: **Completeness, Consistency, Accuracy, Timeliness, Uniquene
 - **Outcome (O):** Customer satisfaction as measured by **review score (1–5)**.
 
 **HYPOTHESIS H1 (business language):**
-> *"Customers whose order is delivered LATE are measurably less satisfied than customers delivered ON TIME — and this gap (4.16 vs 2.57) drives the low review scores and contributes to the failing repeat rate."*
+> *"Customers whose order is delivered LATE are measurably less satisfied than customers delivered ON TIME — and this gap (2.57 vs 4.29) drives low review scores and contributes to the failing repeat rate."*
 
-**Evidence so far (from 2026-08-06 baseline):** on-time score 4.16 vs late 2.57 (−1.6pts). Stat (t-test / effect size) to be validated in **Phase 3**.
+**Evidence — EDA 2026-08-06 (VALIDATED ✅):**
+- On-time avg score **4.29** vs late **2.57** → **1.73-point gap**, statistically significant (**t=89.6, p<0.001**).
+- Dose–response: score 4.41 at ≤7d → 3.49 at 22–30d → **2.18 at 31–60d** (collapse at ~3 weeks).
+- Correlation delivery_days vs score = **r −0.30** (dominant driver in the data).
 
-**Null hypothesis:** late delivery has no meaningful effect on review score.
+**Null hypothesis:** REJECTED — late delivery has a large, significant negative effect on review score.
 
-**Follow-on (Phase 3/4):** Segment effect by category & state (RR/AP/AM show worst delivery → test if they also show worst score).
+**PECO follow-on (Phase 3/4):**
+1. Category × late-delivery interaction on score (do high-value cats suffer more?).
+2. State-level test: NE states (worst delivery) should show worst scores — confirmed directionally in EDA (MA 3.77, AL 3.82).
+3. Link test: does repeat purchase drop *after* a late delivery? (retention ↔ satisfaction link).
 
 ---
 
 ## 7. DECISIONS LOG (tracked — do not rewrite history)
 | Date | Decision | By | Rationale |
 |---|---|---|---|
-| 2026-08-06 | Analyse **delivered orders only** for revenue/satisfaction | Spec §decisions | align with CLAUDE_OLIST.md |
-| 2026-08-06 | Label 610 products `uncategorized`, **do not drop** | Spec §decisions | keep data |
+| 2026-08-06 | Analyse **delivered orders only** for revenue/satisfaction | Spec §decisions | align with CLAUDE, excludes cancelled/other statuses |
+| 2026-08-06 | Label 610 products `uncategorized`, **do not drop** | Spec §decisions | keep data complete |
 | 2026-08-06 | Use `customer_unique_id` for all customer counts | Spec §decisions | `customer_id` inflates |
 | 2026-08-06 | Currency BRL, no conversions | Spec §decisions | — |
-| 2026-08-06 | Geolocation dedup → 1 row/zip | baseline | dedup rule |
+| 2026-08-06 | Geolocation dedup → 1 row/zip | EDA §5 | dedup rule |
+| 2026-08-06 | Untranslated PT categories keep their name; only truly null → `uncategorized` | EDA (found 2 PT-missing cats: `pc_gamer`, `portateis_…`) | don't lump real cats in uncategorized |
+| 2026-08-06 | **EDA to `olist_eda.ipynb` + `eda_summary.json` as canonical statistical source** | EDA | reproducible deep-dive |
 
 ---
 
 ## 8. SESSION LOG — what was done this session
 | Date | Step | Result |
 |---|---|---|
-| 2026-08-06 | EDA baseline snapshot | seeded §5; discovered lagging/core problem = repeat rate 3.12% + late-delivery score gap |
-| 2026-08-06 | DAMA-5 baseline | §7; geolocation dedup is the only real fixing job |
-| 2026-08-06 | PECO H1 | §6; will validate in Phase 3 |
+| 2026-08-06 | EDA baseline snapshot | seeded §4; discovered lagging/core problem = repeat rate 3.12% + late-delivery score gap |
+| 2026-08-06 | DAMA-5 baseline | §5; geolocation dedup is the real cleaning fix |
+| 2026-08-06 | **Full EDA executed** (`olist_eda.ipynb`) | Deep stats → §4; validated PECO H1 (gap 1.73, p<0.001); growth is volume/not-value; NE delivery↔satisfaction compounding |
+| 2026-08-06 | PECO H1 | **VALIDATED ✅** — null rejected; late delivery significant negative effect |
 
 ---
 
 ## 9. SOURCE OF TRUTH & REGENERATION RULES
 - **Any agent / OpenCode session must read this file first** before proceeding.
-- **At the end of every session** (or after each phase step), touch each hot section: §3 (KPIs), §5 (EDA), §6 (hypotheses), §7 (decisions), §8 (session log).
-- If §5 numbers change after cleaning, **update** them (do not stack unfixed numbers).
+- **At the end of every session** (or after each phase step), touch each hot section: §3 (KPIs), §4 (EDA), §5 (DAMA-5), §6 (hypotheses), §7 (decisions), §8 (session log).
+- If §4 numbers change after cleaning, **update** them (do not stack unfixed numbers).
+- Statistical evidence lives in `04_Python/olist_eda.ipynb`; re-run it before major updates.
 - Never erase a past decision from §7 — add a new row with the change.

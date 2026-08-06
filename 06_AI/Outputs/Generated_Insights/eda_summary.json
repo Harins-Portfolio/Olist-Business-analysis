@@ -1,0 +1,22 @@
+{
+  "gross_revenue_brl": 13221498.11,
+  "delivered_orders": 96478,
+  "aov_brl": 137.0415857501192,
+  "unique_customers": 96096,
+  "repeat_rate_pct": 3.1187562437562435,
+  "avg_delivery_days": 12.093604229294082,
+  "median_delivery_days": 10.0,
+  "on_time_rate_pct": 91.88763346117965,
+  "mean_review_score": 4.155716524320005,
+  "score_on_time": 4.2937182046856845,
+  "score_late": 2.5664935064935066,
+  "satisfaction_gap": 1.727224698192178,
+  "peak_month_orders": "2017-11",
+  "peak_revenue_brl": 987765.37,
+  "top_category": "health_beauty",
+  "top_category_rev_brl": 1258681.34,
+  "repeat_customers_rev_share_pct": 5.509275453808615,
+  "aov_repeat_multiple": 1.8850124612476995,
+  "sp_rev_share_pct": 38.280543287049234,
+  "top1pct_sellers_share_pct": 25.513173635358932
+}
