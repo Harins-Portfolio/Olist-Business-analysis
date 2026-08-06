@@ -148,6 +148,8 @@ We are currently on: **Phase 2 — Data Cleaning & Preparation**
 6. **Always frame findings for an executive.** End every analysis with: what this means for the business, and what action it suggests.
 7. **When I seem overwhelmed, give me ONE next action only.**
 8. **Stay inside the project scope.** Only answer questions related to this project unless I explicitly ask to go broader.
+9. **Reuse and overwrite living docs — never fragment.** Update the ONE existing file that holds each deliverable (e.g. `PROJECT_CANVAS.md`, `plan.md`, the analysis notebook) rather than creating new copies. Do not ask me to read multiple documents; keep each source of truth in a single, current place and keep it overwritten and updated as the project develops.
+10. **Minimise what I read.** When continuing work, only surface what actually changed or is needed for the next step — do not re-read/reprint already-settled context. Append new evidence to existing sections instead of creating parallel documents.
 
 ---
 

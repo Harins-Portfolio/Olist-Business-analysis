@@ -182,6 +182,13 @@ Dimensions assessed: **Completeness, Consistency, Accuracy, Timeliness, Uniquene
 | 2026-08-06 | Geolocation dedup → 1 row/zip | EDA §5 | dedup rule |
 | 2026-08-06 | Untranslated PT categories keep their name; only truly null → `uncategorized` | EDA (found 2 PT-missing cats: `pc_gamer`, `portateis_…`) | don't lump real cats in uncategorized |
 | 2026-08-06 | **EDA to `olist_eda.ipynb` + `eda_summary.json` as canonical statistical source** | EDA | reproducible deep-dive |
+| 2026-08-06 | **Phase 2 cleaning executed via `04_Python/ETL/data_preparation.py`** | Cleaning | implements prompts 2.1–2.9; auditable pipeline |
+| 2026-08-06 | **Master `order_revenue` = merchandise value (total_items_price), NOT payment_value** | Cleaning | AOV baseline R$ 137.04 is goods-only; freight (R$ 2.20M) tracked separately in `total_freight`; `total_payment_value` kept as "customer paid" |
+| 2026-08-06 | **Delivered orders with missing/outlier delivery dates excluded from analysis** (8 missing + 14 outliers) | Cleaning | `delivery_days` must be valid for delivery KPIs; flagged rows archived in `06_AI/Outputs/Scratchpad/` |
+| 2026-08-06 | **Reviews deduped to one per order (keep first)** | Cleaning | keeps master at one-row-per-delivered-order grain |
+| 2026-08-06 | **Geolocation: one GPS per zip; 31 out-of-Brazil points removed** | Cleaning | 19,011 zips final; matches EDA §5 |
+| 2026-08-06 | **BOTH revenue columns kept in master** — `order_revenue` (goods, ~R$ 13.2M) AND `order_revenue_incl_freight` (goods+freight, ~R$ 15.4M) | Visualization prep | dashboard headline uses `order_revenue` (matches EDA/AOV R$ 137); incl-freight available for freight-burden story |
+| 2026-08-06 | **Star schema exported for Power BI** → `02_Cleaned_data/star_schema/` (`build_star_schema.py`) | Power BI prep | 7 tables: Dim_Date/Customer/Product/Seller/Geography + Fact_Orders (order grain) + Fact_OrderItems (line grain, enables category/seller). Both revenue definitions in Fact_Orders. Line `line_price` sums exactly to order revenue (R$ 13.2M) — no double count if one grain per visual. `data_model.md` documents keys/relationships/DAX |
 
 ---
 
@@ -192,6 +199,9 @@ Dimensions assessed: **Completeness, Consistency, Accuracy, Timeliness, Uniquene
 | 2026-08-06 | DAMA-5 baseline | §5; geolocation dedup is the real cleaning fix |
 | 2026-08-06 | **Full EDA executed** (`olist_eda.ipynb`) | Deep stats → §4; validated PECO H1 (gap 1.73, p<0.001); growth is volume/not-value; NE delivery↔satisfaction compounding |
 | 2026-08-06 | PECO H1 | **VALIDATED ✅** — null rejected; late delivery significant negative effect |
+| 2026-08-06 | **Phase 2 cleaning & preparation executed** | `data_preparation.py` → 11 files in `02_Cleaned_data/` + `olist_master.csv` (96,456 delivered orders × 40 cols). Master matches EDA baselines (score 4.16, 12.1d delivery, 8.1% late, AOV R$ 136.83, revenue R$ 13.20M). Audit + summary → `06_AI/Outputs/Generated_Docs/` |
+| 2026-08-06 | **High-impact visualizations built** (`04_Python/visualization_insights.ipynb`) | 8 Matplotlib PNGs → `06_AI/Outputs/Generated_Charts/`: correlation heatmap `viz_01`, H1 dose-response `viz_02`, on-vs-late gap `viz_03`, volume-vs-AOV `viz_04`, repeat rate `viz_05`, state delivery↔score `viz_06`, freight burden `viz_07`, category/state concentration `viz_08`. Master-backed figures: repeat rate **3.0%** (2,801/93,336), H1 gap **1.72★** (4.29 vs 2.57), freight **16.6%**, late **8.1%**. |
+| 2026-08-06 | **Star schema exported for Power BI** → `02_Cleaned_data/star_schema/` | 7 tables (5 dims + 2 facts) + `data_model.md`. Integrity: line `line_price` R$ 13.20M == Fact_Orders `order_revenue`, line freight == `total_freight`, 0 orphan item rows, 96,456 order-level rows. Ready for Power BI import in Phase 5 |
 
 ---
 

@@ -1,0 +1,193 @@
+{
+  "orders": {
+    "null_dates": {
+      "order_purchase_timestamp": 0,
+      "order_approved_at": 160,
+      "order_delivered_carrier_date": 1783,
+      "order_delivered_customer_date": 2965,
+      "order_estimated_delivery_date": 0
+    },
+    "delivered": 96478,
+    "missing_delivery_date": 8,
+    "outliers": 14,
+    "final": 96456
+  },
+  "payments": {
+    "types": {
+      "credit_card": 76795,
+      "boleto": 19784,
+      "voucher": 5775,
+      "debit_card": 1529,
+      "not_defined": 3
+    },
+    "zero_neg": 9,
+    "split_orders": 2961,
+    "unique_orders": 99440,
+    "agg_zero_neg": 3
+  },
+  "items": {
+    "price": {
+      "min": 0.85,
+      "max": 6735.0,
+      "mean": 120.65373901464713
+    },
+    "freight": {
+      "min": 0.0,
+      "max": 409.68,
+      "mean": 19.990319928983578
+    },
+    "price_zero_neg": 0,
+    "price_over_max": 3,
+    "freight_neg": 0,
+    "multi_item_orders": 9803,
+    "final_rows": 112647,
+    "agg_orders": 98663
+  },
+  "products": {
+    "null_cat_filled": 610,
+    "unique_categories": 72,
+    "top20": {
+      "bed_bath_table": 3029,
+      "sports_leisure": 2867,
+      "furniture_decor": 2657,
+      "health_beauty": 2444,
+      "housewares": 2335,
+      "auto": 1900,
+      "computers_accessories": 1639,
+      "toys": 1411,
+      "watches_gifts": 1329,
+      "telephony": 1134,
+      "baby": 919,
+      "perfumery": 868,
+      "stationery": 849,
+      "fashion_bags_accessories": 849,
+      "cool_stuff": 789,
+      "garden_tools": 753,
+      "pet_shop": 719,
+      "uncategorized": 623,
+      "electronics": 517,
+      "construction_tools_construction": 400
+    }
+  },
+  "reviews": {
+    "score_null": 0,
+    "score_out_of_range": 0,
+    "distribution": {
+      "1": 11424,
+      "2": 3151,
+      "3": 8179,
+      "4": 19142,
+      "5": 57328
+    },
+    "pct_with_comment": 41.3,
+    "final": 98673
+  },
+  "geolocation": {
+    "unique_zips": 19015,
+    "out_of_bounds": 31,
+    "final_zips": 19011
+  },
+  "master": {
+    "rows": 96456,
+    "cols": 40,
+    "date_min": "2016-09-15",
+    "date_max": "2018-08-29",
+    "pct_late": 8.1,
+    "columns": [
+      "order_id",
+      "customer_id",
+      "order_status",
+      "order_purchase_timestamp",
+      "order_approved_at",
+      "order_delivered_carrier_date",
+      "order_delivered_customer_date",
+      "order_estimated_delivery_date",
+      "delivery_days",
+      "customer_unique_id",
+      "customer_zip_code_prefix",
+      "customer_city",
+      "customer_state",
+      "total_payment_value",
+      "payment_types_used",
+      "payment_installments_max",
+      "item_count",
+      "total_items_price",
+      "total_freight",
+      "n_sellers",
+      "seller_ids",
+      "product_ids",
+      "review_id",
+      "review_score",
+      "review_comment_title",
+      "review_comment_message",
+      "review_creation_date",
+      "review_answer_timestamp",
+      "days_early_or_late",
+      "is_late",
+      "order_month",
+      "order_year",
+      "order_day_of_week",
+      "is_weekend",
+      "purchase_hour",
+      "promised_delivery_days",
+      "delivery_lag_vs_promise_days",
+      "has_review_comment",
+      "order_revenue",
+      "order_revenue_incl_freight"
+    ],
+    "nulls": {
+      "order_approved_at": 14,
+      "order_delivered_carrier_date": 1,
+      "total_payment_value": 1,
+      "payment_types_used": 1,
+      "payment_installments_max": 1,
+      "item_count": 3,
+      "total_items_price": 3,
+      "total_freight": 3,
+      "n_sellers": 3,
+      "seller_ids": 3,
+      "product_ids": 3,
+      "review_id": 645,
+      "review_score": 645,
+      "review_comment_title": 85270,
+      "review_comment_message": 57547,
+      "review_creation_date": 645,
+      "review_answer_timestamp": 645,
+      "order_revenue": 3,
+      "order_revenue_incl_freight": 3
+    },
+    "unique_customers": 93336,
+    "revenue": 13197189.09
+  },
+  "olist_orders_dataset.csv": {
+    "rows_in": 99441
+  },
+  "orders_status": {
+    "delivered": 96478,
+    "shipped": 1107,
+    "canceled": 625,
+    "unavailable": 609,
+    "invoiced": 314,
+    "processing": 301,
+    "created": 5,
+    "approved": 2
+  },
+  "olist_order_payments_dataset.csv": {
+    "rows_in": 103886
+  },
+  "olist_order_items_dataset.csv": {
+    "rows_in": 112650
+  },
+  "olist_products_dataset.csv": {
+    "rows_in": 32951
+  },
+  "product_category_name_translation.csv": {
+    "rows_in": 71
+  },
+  "olist_order_reviews_dataset.csv": {
+    "rows_in": 99224
+  },
+  "olist_geolocation_dataset.csv": {
+    "rows_in": 1000163
+  }
+}
