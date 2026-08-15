@@ -174,6 +174,128 @@ for x in ver["checks"]:
 """))
 
 # --------------------------------------------------------------------------- #
+# SECTION 3 - CONDENSED PER-TABLE PROFILING (6 CORE TABLES)
+# --------------------------------------------------------------------------- #
+cells.append(md(r"""
+## 3. Condensed per-table profiling
+
+Column report + DAMA-5 row + a readable **2×2 chart grid** for the 6 core
+tables (master, orders, payments, items, products, reviews). The remaining 12
+tables are summarized in Section 2's overview grid; full interactive detail for
+every table lives in the HTML report (`descriptive_analysis.html`).
+"""))
+
+cells.append(code(r"""
+def fmt_num(v):
+    try:
+        f = float(v)
+        return str(int(f)) if f.is_integer() else f"{f:,.2f}"
+    except (TypeError, ValueError):
+        return v
+
+
+def column_report(p):
+    rows = []
+    for c in p["columns"]:
+        stat = ""
+        if c["kind"] == "numeric":
+            s = c.get("stats", {})
+            stat = (f"min {fmt_num(s.get('min'))} | med {fmt_num(s.get('median'))} | "
+                    f"mean {fmt_num(s.get('mean'))} | max {fmt_num(s.get('max'))}")
+        elif c["kind"] == "datetime":
+            s = c.get("stats", {})
+            stat = f"{s.get('min', '')} -> {s.get('max', '')}"
+        rows.append({"Column": c["name"], "Dtype": c["dtype"],
+                     "Nulls": f"{c['null']:,} ({c['null_pct']}%)",
+                     "Unique": f"{c['n_unique']:,}", "Summary": stat})
+    return pd.DataFrame(rows)
+
+
+def dama_df(d):
+    return pd.DataFrame([{"Dimension": k, "Verdict": v[0], "Reason": v[1]}
+                         for k, v in d["scores"].items()])
+
+
+CORE = ["master", "orders_clean", "payments", "items", "products", "reviews"]
+
+
+def chart_for(ax, c, df):
+    name, chart, label = c["name"], c["chart"], c.get("label", c["name"])
+    if chart == "donut":
+        s = pd.to_numeric(df[name], errors="coerce").fillna(0)
+        yes = int((s == 1).sum()); total = len(s)
+        col = dl.PALETTE["warn"] if name == "is_late" else dl.PALETTE["ok"]
+        ax.pie([yes, max(total - yes, 0)], labels=["yes", "no"],
+               autopct=lambda v: f"{v:.0f}%" if v >= 3 else "",
+               colors=[col, dl.PALETTE["muted"]], startangle=90,
+               counterclock=False, textprops={"fontsize": 8},
+               wedgeprops=dict(width=0.45))
+        ax.set_title(label, fontsize=10)
+    elif chart == "bar":
+        if c.get("ordered"):
+            num = pd.to_numeric(df[name], errors="coerce")
+            vc = num.value_counts().sort_index() if num.notna().any() \
+                else df[name].astype(str).value_counts().sort_index()
+        else:
+            vc = pd.Series(c.get("top", {})).sort_values()
+        keys, vals = [str(k) for k in vc.index][:12], list(vc.values)[:12]
+        ax.bar(keys, vals, color=dl.PALETTE["ok"])
+        ax.tick_params(axis="x", rotation=45, labelsize=8)
+        ax.set_title(label, fontsize=10)
+    elif chart == "hist":
+        s = pd.to_numeric(df[name], errors="coerce").dropna()
+        if name in dl.MONEY_COLS:
+            edges, st = dl.money_bins(s)
+            ax.hist(s, bins=edges, color=dl.PALETTE["info"], alpha=.85)
+            ax.set_xscale("log")
+            cap = f"med R$ {fmt_num(st['median'])} | mean R$ {fmt_num(st['mean'])}"
+            ax.set_title(f"{label}\n{cap}", fontsize=9)
+            ax.set_xlabel("R$ (log scale)")
+        else:
+            bins = min(30, max(int(s.nunique()), 1))
+            ax.hist(s, bins=bins, color=dl.PALETTE["info"], alpha=.85)
+            ax.set_title(label, fontsize=10)
+        ax.set_ylabel("count")
+    elif chart == "trend":
+        s = pd.to_datetime(df[name], errors="coerce").dropna()
+        mm = s.dt.to_period("M").astype(str).value_counts().sort_index()
+        ax.plot(mm.index, mm.values, color=dl.PALETTE["info"], marker="o", ms=3, lw=1.4)
+        ax.tick_params(axis="x", labelrotation=45, labelsize=7)
+        ax.set_title(label, fontsize=10)
+        ax.set_ylabel("count")
+    else:
+        ax.axis("off")
+
+
+def profile_section(key):
+    t = next(x for x in dl.TABLES if x["key"] == key)
+    p = dl.profile_table(t["rel"]); d = dl.dama5(p)
+    print(f"### {p['label']}  (`{p['rel']}`) — {p['rows']:,} rows x {p['cols']} cols "
+          f"| DAMA-5 overall: {d['overall'].upper()}")
+    display(column_report(p))
+    display(dama_df(d))
+    charted = [c for c in p["columns"] if c.get("chart") not in ("skip", None)]
+    if not charted:
+        print("(no plottable columns)")
+        return
+    picks = charted[:4] + [None] * max(4 - len(charted), 0)
+    fig, axes = plt.subplots(2, 2, figsize=(10, 8))
+    for ax, c in zip(axes.ravel(), picks):
+        if c is None:
+            ax.axis("off")
+            continue
+        chart_for(ax, c, p["df"])
+    fig.suptitle(f"{p['label']} — key distributions", fontsize=13, fontweight="bold")
+    plt.tight_layout()
+    plt.show()
+"""))
+
+cells.append(code(r"""
+for key in CORE:
+    profile_section(key)
+"""))
+
+# --------------------------------------------------------------------------- #
 # ASSEMBLY - later sections append above this line
 # --------------------------------------------------------------------------- #
 def build():
