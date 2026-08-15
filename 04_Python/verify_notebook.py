@@ -23,7 +23,7 @@ def main():
     builder.build()
     out_dir = Path(tempfile.mkdtemp(prefix="nbcheck_"))
     r = subprocess.run(
-        [sys.executable, "-m", "jupyter", "nbconvert", "--to", "notebook",
+        [sys.executable, "-m", "nbconvert", "--to", "notebook",
          "--execute", "--ExecutePreprocessor.timeout=900", str(NB),
          "--output", "executed.ipynb", "--output-dir", str(out_dir)],
         cwd=str(ROOT), capture_output=True, text=True)
