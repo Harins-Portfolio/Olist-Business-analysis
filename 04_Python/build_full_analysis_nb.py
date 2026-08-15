@@ -380,6 +380,81 @@ print(dow.to_string())
 """))
 
 # --------------------------------------------------------------------------- #
+# SECTION 6 - CATEGORY MIX & CONCENTRATION
+# --------------------------------------------------------------------------- #
+cells.append(md(r"""
+## 6. Category mix & concentration
+
+Revenue share, AOV and order share per product category. This is where the
+"long tail" structure of the catalogue becomes visible.
+"""))
+
+cells.append(code(r"""
+# Fact_OrderItems has NO category column (product_id only), so join to products
+# on product_id; products_clean carries both product_category_name (pt) and the
+# translated category_english column.
+prod = pd.read_csv(CLEAN / "products_clean.csv")
+cat = fi[["order_id", "product_id", "line_price"]].merge(
+    prod[["product_id", "category_english", "product_category_name"]],
+    on="product_id", how="left")
+cat["category"] = (cat["category_english"].fillna(cat["product_category_name"])
+                   .fillna("(unknown)"))
+
+cat_rev = (cat.groupby("category")
+              .agg(revenue=("line_price", "sum"),
+                   orders=("order_id", "nunique"),
+                   items=("line_price", "size"))
+              .sort_values("revenue", ascending=False))
+cat_rev["revenue_share"] = cat_rev["revenue"] / cat_rev["revenue"].sum()
+cat_rev["aov"] = cat_rev["revenue"] / cat_rev["orders"]
+cat_rev["order_share"] = cat_rev["orders"] / cat_rev["orders"].sum()
+print(f"{len(cat_rev)} categories | {(cat['category'] == '(unknown)').sum()} items w/o "
+      f"category | items revenue R$ {cat_rev['revenue'].sum():,.0f}")
+"""))
+
+cells.append(code(r"""
+top = cat_rev.head(10)
+fig, ax = plt.subplots(figsize=(9.5, 5))
+ax.barh(top.index[::-1], top["revenue_share"].values[::-1], color=dl.PALETTE["ok"])
+ax.set_xlabel("Share of gross revenue")
+ax.set_title("Top-10 categories by revenue share (long tail: ~62 categories below)")
+plt.tight_layout(); plt.show()
+"""))
+
+cells.append(code(r"""
+share5 = cat_rev["revenue_share"].head(5).sum()
+print(f"Long-tail structure: top-5 categories {share5:.0%} of revenue; "
+      f"{len(cat_rev)} categories in total.")
+print(cat_rev.head(15).to_string())
+"""))
+
+# --------------------------------------------------------------------------- #
+# SECTION 7 - PAYMENT BEHAVIOUR
+# --------------------------------------------------------------------------- #
+cells.append(md(r"""
+## 7. Payment behaviour
+
+Payment methods, installment usage, and the share of cash-vs-installment
+transactions, with the freight burden context.
+"""))
+
+cells.append(code(r"""
+pm = dl.read_table("payments_clean.csv")
+print(pm.head())
+print("\nPayment types distribution:")
+print(pm["payment_types_used"].value_counts().to_string())
+"""))
+
+cells.append(code(r"""
+ins = pm["payment_installments_max"].value_counts().sort_index()
+fig, ax = plt.subplots(figsize=(9, 4))
+ax.bar([str(i) for i in ins.index], ins.values, color=dl.PALETTE["info"])
+ax.set_title("Distribution of payment installments (max per order)")
+ax.set_xlabel("Installments"); ax.set_ylabel("Orders")
+plt.tight_layout(); plt.show()
+"""))
+
+# --------------------------------------------------------------------------- #
 # ASSEMBLY - later sections append above this line
 # --------------------------------------------------------------------------- #
 def build():
