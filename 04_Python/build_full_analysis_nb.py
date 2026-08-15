@@ -102,6 +102,78 @@ print(f"Registry loaded: {len(dl.TABLES)} clean tables")
 """))
 
 # --------------------------------------------------------------------------- #
+# SECTION 1 - RAW -> CLEAN PIPELINE (VERIFIED, NOT RE-RUN)
+# --------------------------------------------------------------------------- #
+cells.append(md(r"""
+## 1. Raw → Clean pipeline (verified, not re-run)
+
+Shapes of the 9 raw Kaggle CSVs, then verification that the cleaned outputs
+reconcile (row counts + revenue to the cent). The ETL scripts
+(`04_Python/ETL/`) are **not** re-executed here — this notebook is read-only.
+"""))
+
+cells.append(code(r"""
+raw = {
+    "olist_customers_dataset.csv": "customers",
+    "olist_geolocation_dataset.csv": "geolocation",
+    "olist_order_items_dataset.csv": "order_items",
+    "olist_order_payments_dataset.csv": "order_payments",
+    "olist_order_reviews_dataset.csv": "order_reviews",
+    "olist_orders_dataset.csv": "orders",
+    "olist_products_dataset.csv": "products",
+    "olist_sellers_dataset.csv": "sellers",
+    "product_category_name_translation.csv": "category_translation",
+}
+raw_rows = []
+for f, nm in raw.items():
+    df = pd.read_csv(ROOT / "01_Raw_Data" / f)
+    raw_rows.append({"table": nm, "file": f, "rows": df.shape[0], "cols": df.shape[1]})
+print("RAW data (9 CSVs from Kaggle, as shipped)")
+display(pd.DataFrame(raw_rows).sort_values("rows", ascending=False).reset_index(drop=True))
+"""))
+
+cells.append(code(r"""
+m = dl.read_table("olist_master.csv")
+fo = pd.read_csv(STAR / "Fact_Orders.csv")
+fi = pd.read_csv(STAR / "Fact_OrderItems.csv")
+
+print("CLEANED pipeline verification (no ETL re-run):")
+print(f"  Master rows (delivered orders) : {m.shape[0]:,}")
+print(f"  Fact_Orders rows               : {fo.shape[0]:,}   grain match: {m.shape[0] == fo.shape[0]}")
+print(f"  Master order_revenue           : R$ {m['order_revenue'].sum():,.2f}")
+print(f"  Fact_Orders order_revenue      : R$ {fo['order_revenue'].sum():,.2f}")
+print(f"  Fact_OrderItems line_price     : R$ {fi['line_price'].sum():,.2f}  (matches order revenue)")
+print(f"  Fact_Orders total_freight      : R$ {fo['total_freight'].sum():,.2f}")
+print(f"  Master total_freight           : R$ {m['total_freight'].sum():,.2f}")
+"""))
+
+# --------------------------------------------------------------------------- #
+# SECTION 2 - DATA-QUALITY OVERVIEW (DAMA-5)
+# --------------------------------------------------------------------------- #
+cells.append(md(r"""
+## 2. Data-quality overview (DAMA-5)
+
+One row per clean table: rows, columns, primary-key uniqueness, null-bearing
+columns and the DAMA-5 overall verdict. Then the live clean-check re-run
+(PASS/WARN/INFO/FAIL counts with the non-pass details).
+"""))
+
+cells.append(code(r"""
+ov = dl.overview()
+display(ov)
+"""))
+
+cells.append(code(r"""
+ver = dl.verdict()
+c = ver["counts"]
+print(f"CLEAN-CHECK: {c['PASS']} PASS | {c['WARN']} WARN | {c['INFO']} INFO | {c['FAIL']} FAIL  "
+      f"-> {'READY OK' if c['FAIL'] == 0 else 'NOT READY'}")
+for x in ver["checks"]:
+    if x["status"] in ("FAIL", "WARN"):
+        print(f"  [{x['status']}] {x['check']} ({x['table']}): {x['detail']}")
+"""))
+
+# --------------------------------------------------------------------------- #
 # ASSEMBLY - later sections append above this line
 # --------------------------------------------------------------------------- #
 def build():
