@@ -296,6 +296,90 @@ for key in CORE:
 """))
 
 # --------------------------------------------------------------------------- #
+# SECTION 4 - CORE MONEY & SCALE KPIs
+# --------------------------------------------------------------------------- #
+cells.append(md(r"""
+## 4. Core money & scale KPIs
+
+Headline numbers on the delivered-orders universe: revenue (goods), freight,
+delivered orders, AOV, unique customers and the critical repeat rate.
+"""))
+
+cells.append(code(r"""
+rev = m["order_revenue"].sum()
+freight = m["total_freight"].sum()
+aov = rev / len(m)
+cust_count = m.groupby("customer_unique_id").size()
+repeat_rate = (cust_count > 1).mean()
+
+kpi = pd.DataFrame({
+    "Metric": ["Gross revenue (goods)", "Total freight", "Delivered orders",
+               "Average order value (AOV)", "Unique customers", "Repeat rate"],
+    "Value": [f"R$ {rev:,.0f}", f"R$ {freight:,.0f}  ({freight/rev:.1%} of revenue)",
+              f"{len(m):,}", f"R$ {aov:,.2f}", f"{len(cust_count):,}", f"{repeat_rate:.2%}"]})
+display(kpi)
+print(f"Customers with >=3 orders: {(cust_count >= 3).sum():,} ({(cust_count >= 3).mean():.2%})")
+print(f"Avg orders per customer: {cust_count.mean():.3f}")
+"""))
+
+# --------------------------------------------------------------------------- #
+# SECTION 5 - GROWTH & SEASONALITY
+# --------------------------------------------------------------------------- #
+cells.append(md(r"""
+## 5. Growth & seasonality
+
+Monthly revenue / volume / AOV, month-over-month momentum, the Black Friday
+Nov-2017 spike, and weekday vs weekend behaviour. **Saves `viz_04`**.
+"""))
+
+cells.append(code(r"""
+m["order_date"] = m["order_purchase_timestamp"].dt.to_period("M")
+g = m.groupby("order_date").agg(orders=("order_id", "size"),
+                                revenue=("order_revenue", "sum"))
+g["aov"] = g["revenue"] / g["orders"]
+g["mom"] = g["orders"].pct_change() * 100
+g["revenue_mom"] = g["revenue"].pct_change() * 100
+print("MONTHLY SERIES (orders, revenue, AOV)")
+print(g[["orders", "revenue", "aov"]].to_string())
+print(f"\nMedian monthly volume growth: {g['mom'].median():.1f}%")
+print(f"Median monthly revenue growth: {g['revenue_mom'].median():.1f}%")
+print(f"Peak order month: {g['orders'].idxmax()} ({g['orders'].max():,} orders)")
+print(f"Peak revenue month: {g['revenue'].idxmax()} (R$ {g['revenue'].max():,.0f})")
+"""))
+
+cells.append(code(r"""
+xx = range(len(g))
+fig, ax = plt.subplots(figsize=(9.5, 4.5))
+ax.bar(xx, g["orders"], color=GRAY, alpha=0.55, label="Orders")
+ax2 = ax.twinx()
+ax2.plot(xx, g["revenue"] / 1e3, color=NAVY, lw=2.4, marker="o", ms=3, label="Revenue (k)")
+ax2.plot(xx, g["aov"], color=RED, lw=1.8, ls="--", label="AOV")
+ax.set_xticks(xx, [str(x) for x in g.index], rotation=75, fontsize=8)
+ax.set_ylabel("Order volume"); ax2.set_ylabel("Revenue (R$ k) / AOV")
+ax.legend(loc="upper left"); ax2.legend(loc="upper center")
+ax.set_title("Growth is volume-driven (Black Friday Nov-2017 spike), AOV flat ~R$ 137")
+savefig("viz_04_monthly_revenue_volume.png")
+"""))
+
+cells.append(code(r"""
+bf = m[m["order_purchase_timestamp"].dt.to_period("M") == pd.Period("2017-11", freq="M")]
+avg_orders = g["orders"].mean()
+print(f"Black Friday Nov-2017: {len(bf):,} orders, R$ {bf['order_revenue'].sum():,.0f} "
+      f"({len(bf)/avg_orders - 1:+.0%} vs monthly avg {avg_orders:,.0f})")
+
+wk = m.groupby(m["order_purchase_timestamp"].dt.dayofweek.ge(5)).agg(
+    orders=("order_id", "size"), aov=("order_revenue", "mean"))
+wk.index = ["weekday", "weekend"]
+print("\nWeekday vs weekend:")
+print(wk.to_string())
+
+dow = m["order_purchase_timestamp"].dt.dayofweek.value_counts().sort_index()
+dow.index = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+print("\nDay-of-week order mix:")
+print(dow.to_string())
+"""))
+
+# --------------------------------------------------------------------------- #
 # ASSEMBLY - later sections append above this line
 # --------------------------------------------------------------------------- #
 def build():
