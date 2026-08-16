@@ -455,6 +455,53 @@ plt.tight_layout(); plt.show()
 """))
 
 # --------------------------------------------------------------------------- #
+# SECTION 8 - GEOGRAPHY
+# --------------------------------------------------------------------------- #
+cells.append(md(r"""
+## 8. Geography
+
+Revenue and orders by customer state (SP dominance), with delivery time and
+review score per state. **Saves `viz_06`**.
+"""))
+
+cells.append(code(r"""
+st = m.groupby("customer_state").agg(
+    orders=("order_id", "size"),
+    revenue=("order_revenue", "sum"),
+    delivery=("delivery_days", "mean"),
+    score=("review_score", "mean"),
+).sort_values("revenue", ascending=False)
+st["rev_share"] = st["revenue"] / st["revenue"].sum()
+print(f"States covered: {len(st)} | SP revenue share: {st.loc['SP','rev_share']:.1%}")
+print(st.to_string())
+"""))
+
+cells.append(code(r"""
+fig, ax = plt.subplots(figsize=(9.5, 5))
+ax.bar(st.index, st["rev_share"] * 100, color=dl.PALETTE["ok"])
+ax.set_xlabel("Customer state"); ax.set_ylabel("Revenue share (%)")
+ax.set_title("Revenue concentration in SP (single mega-state, rest is long tail)")
+plt.tight_layout(); plt.show()
+"""))
+
+cells.append(code(r"""
+dd = st[["delivery", "score"]].copy()
+mm = dd.mean()
+fig, ax = plt.subplots(figsize=(9.5, 4.5))
+ax.scatter(dd["delivery"], dd["score"], c=GRAY, alpha=0.75, s=45)
+ax.axvline(mm["delivery"], color=RED, ls="--", lw=1.2, label="mean delivery")
+ax.axhline(mm["score"], color=NAVY, ls="--", lw=1.2, label="mean score")
+for s in ["SP", "RJ", "MG", "RS", "PR", "SC"]:
+    r = st.loc[s]
+    ax.annotate(s, (r["delivery"], r["score"]), fontsize=8)
+ax.set_xlabel("Avg delivery days"); ax.set_ylabel("Avg review score")
+ax.set_title("State satisfaction vs delivery speed — no strong link at state level")
+ax.legend(fontsize=8)
+savefig("viz_06_state_delivery_vs_score.png")
+plt.tight_layout(); plt.show()
+"""))
+
+# --------------------------------------------------------------------------- #
 # ASSEMBLY - later sections append above this line
 # --------------------------------------------------------------------------- #
 def build():
