@@ -605,6 +605,92 @@ plt.tight_layout(); plt.show()
 """))
 
 # --------------------------------------------------------------------------- #
+# SECTION 10 - SELLERS, REPEAT CUSTOMERS, FREIGHT & CONCENTRATION
+# --------------------------------------------------------------------------- #
+cells.append(md(r"""
+## 10. Sellers, repeat customers, freight & concentration
+
+Seller base size and its revenue share, repeat-customer economics (the
+repeat-rate number that matters), freight burden on orders, and the
+concentration structure of the whole marketplace. **Saves `viz_05`, `viz_07`,
+`viz_08`**.
+"""))
+
+cells.append(code(r"""
+sellers = fi.groupby("seller_id").agg(
+    orders=("order_id", "size"),
+    revenue=("line_price", "sum"),
+    freight=("line_freight", "sum"),
+).sort_values("revenue", ascending=False)
+print(f"Sellers: {len(sellers):,} | Top-10 share of seller revenue: "
+      f"{sellers['revenue'].head(10).sum() / sellers['revenue'].sum():.1%}")
+print(f"Median seller revenue: R$ {sellers['revenue'].median():,.0f} "
+      f"vs mean R$ {sellers['revenue'].mean():,.0f}")
+"""))
+
+cells.append(code(r"""
+freq = m.groupby("customer_unique_id").size()
+repeat_ids = freq[freq > 1].index
+repeat_rate = (freq > 1).mean()
+crev = m.set_index("customer_unique_id")["order_revenue"]
+rep_rev_share = crev.loc[crev.index.isin(repeat_ids)].sum() / crev.sum()
+aov_repeat_mult = crev.loc[crev.index.isin(repeat_ids)].mean() / crev.loc[~crev.index.isin(repeat_ids)].mean()
+print(f"Repeat customers: {len(repeat_ids):,} ({repeat_rate:.2%} of customers)")
+print(f"Revenue share from repeat customers: {rep_rev_share:.1%}")
+print(f"AOV repeat vs one-time multiplier: {aov_repeat_mult:.2f}x")
+sagg = pd.DataFrame({
+    "cohort": ["one-time", "repeat"],
+    "customers": [(freq == 1).sum(), (freq > 1).sum()],
+    "revenue": [crev.loc[~crev.index.isin(repeat_ids)].sum(), rep_rev_share * crev.sum()]})
+display(sagg)
+"""))
+
+cells.append(code(r"""
+fig, ax = plt.subplots(figsize=(9.5, 4.5))
+share = freq.value_counts().sort_index()
+ax.bar([str(i) for i in share.index], share.values, color=dl.PALETTE["ok"])
+ax.set_xlabel("Orders per customer"); ax.set_ylabel("Customers")
+ax.set_title("Order-frequency distribution — most customers order once")
+savefig("viz_05_repeat_rate.png")
+plt.tight_layout(); plt.show()
+"""))
+
+cells.append(code(r"""
+m["freight_ratio"] = m["total_freight"] / m["order_revenue"]
+print(m["freight_ratio"].describe().to_string())
+print(f"Orders where freight > 20% of value: {(m['freight_ratio'] > 0.2).mean():.1%}")
+fig, ax = plt.subplots(figsize=(9.5, 4.5))
+fr = m["freight_ratio"].clip(upper=1)
+ax.hist(fr, bins=40, color=dl.PALETTE["info"])
+ax.set_xlabel("Freight / order value ratio"); ax.set_ylabel("Orders")
+ax.set_title("Freight burden — most orders under 15%, heavy tail above 30%")
+savefig("viz_07_freight_burden.png")
+plt.tight_layout(); plt.show()
+"""))
+
+cells.append(code(r"""
+def concentration(series, label):
+    s = series.sort_values(ascending=False).reset_index(drop=True)
+    cum = s.cumsum() / s.sum()
+    top10 = cum.iloc[9] if len(cum) >= 10 else 1.0
+    top20 = cum.iloc[19] if len(cum) >= 20 else 1.0
+    print(f"{label}: top-10 {top10:.1%} | top-20 {top20:.1%} | base n={len(s):,}")
+    return cum
+
+cum_seller = concentration(sellers["revenue"], "Seller revenue")
+cum_state = concentration(m.groupby("customer_state")["order_revenue"].sum(), "State revenue")
+fig, ax = plt.subplots(figsize=(9.5, 4.5))
+ax.plot(cum_seller.index + 1, cum_seller.values * 100, color=NAVY, label="Sellers")
+ax.plot(cum_state.index + 1, cum_state.values * 100, color=RED, label="States")
+ax.axhline(80, color=GRAY, ls="--", lw=1)
+ax.set_xlabel("Rank (sorted by revenue desc)"); ax.set_ylabel("Cumulative revenue share (%)")
+ax.set_title("Concentration curves — the platform is Pareto-shaped at every level")
+ax.legend(); ax.set_xlim(0, 200)
+savefig("viz_08_concentration.png")
+plt.tight_layout(); plt.show()
+"""))
+
+# --------------------------------------------------------------------------- #
 # ASSEMBLY - later sections append above this line
 # --------------------------------------------------------------------------- #
 def build():
