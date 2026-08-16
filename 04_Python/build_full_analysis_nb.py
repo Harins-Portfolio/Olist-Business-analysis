@@ -691,6 +691,55 @@ plt.tight_layout(); plt.show()
 """))
 
 # --------------------------------------------------------------------------- #
+# SECTION 11 - CROSS-TABLE CONSISTENCY (EXPLAIN vs REPRODUCE)
+# --------------------------------------------------------------------------- #
+cells.append(md(r"""
+## 11. Cross-table consistency
+
+The numbers in this notebook must be reproducible from the underlying star
+schema. This section re-derives the headline figures from the separate clean
+tables (payments, reviews, items) and cross-checks them against the master and
+the Fact tables.
+"""))
+
+cells.append(code(r"""
+py = dl.read_table("payments_clean.csv")
+rv = dl.read_table("reviews_clean.csv")
+it = dl.read_table("items_clean.csv")
+
+print("Cross-check 1 — master revenue vs items (price) vs payments:")
+print(f"  master order_revenue      : R$ {m['order_revenue'].sum():,.2f}")
+print(f"  items price               : R$ {it['price'].sum():,.2f}")
+print(f"  payments total value      : R$ {py['total_payment_value'].sum():,.2f}")
+
+print("\nCross-check 2 — review coverage:")
+print(f"  master orders with review : {(~m['review_score'].isna()).sum():,} / {len(m):,}")
+print(f"  reviews_clean rows        : {len(rv):,}")
+
+print("\nCross-check 3 — Fact_Orders vs master grain:")
+print(f"  fo rows = {len(fo):,}  m rows = {len(m):,}  match = {len(fo) == len(m)}")
+
+print("\nCross-check 4 — master vs items item count:")
+print(f"  master item_count sum     : {m['item_count'].sum():,}")
+print(f"  items rows                : {len(it):,}")
+"""))
+
+cells.append(code(r"""
+print("Cross-check 5 — monthly revenue from Fact_Orders re-derivation:")
+fo2 = fo.copy()
+fo2["month"] = pd.to_datetime(fo2["order_date"]).dt.to_period("M")
+gm = fo2.groupby("month")["order_revenue"].sum()
+diff = (gm - g["revenue"]).abs().max()
+print(f"  max |fact - master| monthly revenue diff: R$ {diff:,.2f}  -> {'MATCH' if diff < 1 else 'MISMATCH'}")
+
+print("\nCross-check 6 — state revenue re-derived from Fact_Orders:")
+fo3 = fo.merge(m[["order_id", "customer_state"]], on="order_id", how="left")
+gs = fo3.groupby("customer_state")["order_revenue"].sum()
+match = (gs - st["revenue"]).abs().max()
+print(f"  max |fact - master| state revenue diff: R$ {match:,.2f}  -> {'MATCH' if match < 1 else 'MISMATCH'}")
+"""))
+
+# --------------------------------------------------------------------------- #
 # ASSEMBLY - later sections append above this line
 # --------------------------------------------------------------------------- #
 def build():
