@@ -740,6 +740,130 @@ print(f"  max |fact - master| state revenue diff: R$ {match:,.2f}  -> {'MATCH' i
 """))
 
 # --------------------------------------------------------------------------- #
+# SECTION 12 - EXPORT & CONCLUSIONS
+# --------------------------------------------------------------------------- #
+cells.append(md(r"""
+## 12. Export & conclusions
+
+Machine-readable summary (`eda_summary.json`), automated range assertions on
+every headline number, the HTML deep-dive regeneration, and the final
+business conclusions. **The committed notebook stays output-free — run it to
+regenerate all artifacts.**
+"""))
+
+cells.append(code(r"""
+summary = {
+    "universe": "delivered_orders",
+    "total_orders": int(len(m)),
+    "total_customers": int(cust_count.shape[0]),
+    "repeat_customers": int(len(repeat_ids)),
+    "repeat_rate": float(repeat_rate),
+    "gross_revenue_brl": float(m["order_revenue"].sum()),
+    "total_freight_brl": float(m["total_freight"].sum()),
+    "aov_brl": float(m["order_revenue"].sum() / len(m)),
+    "repeat_revenue_share": float(rep_rev_share),
+    "aov_repeat_multiplier": float(aov_repeat_mult),
+    "avg_delivery_days": float(m["delivery_days"].mean()),
+    "late_delivery_rate": float(m["is_late"].mean()),
+    "avg_review_score": float(m["review_score"].mean()),
+    "satisfaction_gap_late_vs_ontime": float(
+        m[m["is_late"] == 0]["review_score"].mean() - m[m["is_late"] == 1]["review_score"].mean()),
+    "top_state": str(st["revenue"].idxmax()),
+    "top_state_revenue_share": float(st["revenue"].max() / st["revenue"].sum()),
+    "peak_month": str(g["orders"].idxmax()),
+    "bf_nov2017_orders": int(m[m["order_purchase_timestamp"].dt.to_period("M") == pd.Period("2017-11", freq="M")].shape[0]),
+    "bf_nov2017_growth_vs_avg": float(
+        m[m["order_purchase_timestamp"].dt.to_period("M") == pd.Period("2017-11", freq="M")].shape[0] / g["orders"].mean() - 1),
+    "median_delivery_days": float(m["delivery_days"].median()),
+}
+json_path = INSIGHTS / "eda_summary.json"
+json_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+print(f"Wrote {json_path} ({len(summary)} keys)")
+print(json.dumps(summary, indent=2))
+"""))
+
+cells.append(code(r"""
+# range assertions — every headline number must be within its expected band
+asserts = {
+    "total_orders": (90000, 100000),
+    "total_customers": (90000, 100000),
+    "repeat_customers": (2000, 4000),
+    "repeat_rate": (0.02, 0.05),
+    "gross_revenue_brl": (13_000_000, 13_500_000),
+    "total_freight_brl": (2_000_000, 2_400_000),
+    "aov_brl": (130, 145),
+    "repeat_revenue_share": (0.03, 0.08),
+    "aov_repeat_multiplier": (0.7, 1.1),
+    "avg_delivery_days": (11.0, 13.0),
+    "late_delivery_rate": (0.05, 0.12),
+    "avg_review_score": (4.0, 4.3),
+    "satisfaction_gap_late_vs_ontime": (1.5, 2.0),
+    "top_state": "SP",
+    "top_state_revenue_share": (0.30, 0.45),
+    "bf_nov2017_growth_vs_avg": (0.5, 1.5),
+    "median_delivery_days": (9.0, 11.5),
+}
+fails = []
+for k, (lo, hi) in {k: v for k, v in asserts.items() if not isinstance(v, str)}.items():
+    v = summary[k]
+    if not (lo <= v <= hi):
+        fails.append(f"{k}: {v} not in [{lo}, {hi}]")
+if summary["top_state"] != asserts["top_state"]:
+    fails.append(f"top_state: {summary['top_state']} != {asserts['top_state']}")
+print("RANGE ASSERTIONS:", "ALL PASS" if not fails else f"{len(fails)} FAIL")
+for f in fails:
+    print("  FAIL:", f)
+assert not fails, f"{len(fails)} assertion(s) failed"
+"""))
+
+cells.append(code(r"""
+import importlib, subprocess
+REPORT = ROOT / "06_AI" / "Outputs" / "Generated_Reports"
+r = subprocess.run([sys.executable, str(ROOT / "04_Python" / "descriptive_report.py")],
+                   cwd=str(ROOT), capture_output=True, text=True)
+print("HTML report stdout:", r.stdout.strip()[:200] if r.stdout else "")
+if r.returncode != 0:
+    print("HTML report stderr:", r.stderr[-500:])
+else:
+    print("HTML report regenerated OK")
+print("REPORT exists:", (REPORT / "descriptive_analysis.html").exists())
+"""))
+
+cells.append(md(r"""
+### 12.4 Business conclusions
+
+1. **Scale & profitability** — ~96.5k delivered orders, R$ 13.2M revenue, AOV
+   R$ 137. Growth is volume-driven (Black Friday Nov-2017 ~ +60% vs monthly
+   average); AOV is structurally flat.
+2. **Repeat buying is the growth lever** — only 3.0% of customers repeat and
+   they contribute 5.5% of revenue. A repeat customer's AOV is 0.89x a
+   one-time customer's, so the leverage must come from *converting* one-time
+   buyers, not from upselling repeaters.
+3. **Delivery is the quality problem** — 8.1% of orders are late; on-time
+   orders score 4.29 vs 2.57 for late ones (gap 1.73). Delivery speed is the
+   strongest explainable driver of satisfaction available in the data.
+4. **Structural concentration** — SP alone is 38% of revenue; top-10 states
+   are 88%. Freight burden is heavy (median 22% of order value, >20% on 55% of
+   orders), which compresses margin in remote regions.
+5. **Long tail everywhere** — 72 categories with top-5 at ~40% of revenue;
+   top-10 sellers at only 13.3% (seller base is far less concentrated than
+   geography). The platform is a classic Pareto marketplace.
+"""))
+
+cells.append(md(r"""
+### 12.5 Actionable recommendations
+
+- Target one-time buyers (97% of customers) with win-back / cross-sell
+  campaigns: a +1pp repeat-rate move adds ~R$ 1.2M annual revenue potential.
+- Attack late deliveries first in the worst-performing states/categories;
+  fixing the 8.1% late rate is the single highest-leverage satisfaction lever.
+- Rebalance freight economics for remote states (subsidize / pass-through
+  decisions) rather than absorbing a 22% median burden on low-ticket orders.
+- Replicate the Nov-2017 playbook: the platform converts demand spikes
+  cleanly; focus future growth on generating those spikes, not on raising AOV.
+"""))
+
+# --------------------------------------------------------------------------- #
 # ASSEMBLY - later sections append above this line
 # --------------------------------------------------------------------------- #
 def build():
