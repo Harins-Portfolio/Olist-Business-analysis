@@ -502,6 +502,109 @@ plt.tight_layout(); plt.show()
 """))
 
 # --------------------------------------------------------------------------- #
+# SECTION 9 - DELIVERY PERFORMANCE & SATISFACTION
+# --------------------------------------------------------------------------- #
+cells.append(md(r"""
+## 9. Delivery performance & satisfaction
+
+On-time vs late rates, delivery-time distribution, the late-delivery impact on
+review scores, and the correlation between delivery speed and money metrics.
+**Saves `viz_01`, `viz_02`, `viz_03`**.
+"""))
+
+cells.append(code(r"""
+late_rate = m["is_late"].mean()
+print(f"Late delivery rate: {late_rate:.2%}")
+print(f"Avg delivery time: {m['delivery_days'].mean():.2f} days")
+print(f"Median delivery time: {m['delivery_days'].median():.1f} days")
+means = m.groupby("is_late").agg(
+    score=("review_score", "mean"),
+    revenue=("order_revenue", "mean"),
+    rev_incl=("order_revenue_incl_freight", "mean"),
+    freight=("total_freight", "mean"),
+)
+print("\nOn-time (0) vs late (1):")
+print(means.to_string())
+"""))
+
+cells.append(code(r"""
+fig, ax = plt.subplots(figsize=(9.5, 4.5))
+ax.hist(m["delivery_days"], bins=50, color=GRAY, alpha=0.7)
+ax.axvline(m["delivery_days"].mean(), color=RED, ls="--", label="mean")
+ax.axvline(m["delivery_days"].median(), color=NAVY, ls="--", label="median")
+ax.set_xlabel("Delivery days"); ax.set_ylabel("Orders")
+ax.set_title("Delivery-time distribution (right-skewed, mean 12.1d > median 11d)")
+ax.legend()
+savefig("viz_02_score_by_delivery_bucket.png")
+plt.tight_layout(); plt.show()
+"""))
+
+cells.append(code(r"""
+d = m.copy()
+d["bucket"] = pd.cut(d["delivery_days"], bins=[0, 5, 10, 15, 20, 30, 60, d["delivery_days"].max()])
+b = d.groupby("bucket", observed=True).agg(
+    orders=("order_id", "size"),
+    score=("review_score", "mean"),
+    share=("order_id", lambda s: s.size / len(d)),
+).reset_index()
+b["score"] = b["score"].round(2)
+print(b.to_string())
+fig, ax = plt.subplots(figsize=(9.5, 4.5))
+ax.bar(b["bucket"].astype(str), b["score"], color=dl.PALETTE["info"])
+ax.set_title("Review score by delivery bucket — late (>15d) scores drop ~1 point")
+ax.set_xlabel("Delivery days bucket"); ax.set_ylabel("Mean review score")
+plt.tight_layout(); plt.show()
+"""))
+
+cells.append(code(r"""
+fig, axes = plt.subplots(1, 2, figsize=(11, 4.2))
+axes[0].scatter(m["delivery_days"], m["review_score"], s=2, alpha=0.15, c=GRAY)
+axes[0].set_xlabel("Delivery days"); axes[0].set_ylabel("Review score")
+axes[0].set_title("Delivery days vs score (r ≈ {:.2f})".format(m[["delivery_days","review_score"]].corr().iloc[0,1]))
+axes[1].scatter(m["delivery_days"], m["order_revenue"], s=2, alpha=0.15, c=GRAY)
+axes[1].set_xlabel("Delivery days"); axes[1].set_ylabel("Order revenue (R$)")
+axes[1].set_title("Delivery days vs revenue (r ≈ {:.2f})".format(m[["delivery_days","order_revenue"]].corr().iloc[0,1]))
+plt.tight_layout(); plt.show()
+"""))
+
+cells.append(code(r"""
+corr = m[["delivery_days", "days_early_or_late", "is_late", "review_score",
+          "order_revenue", "order_revenue_incl_freight", "total_freight"]].corr()
+fig, ax = plt.subplots(figsize=(8, 6.5))
+im = ax.imshow(corr.values, cmap="RdBu_r", vmin=-1, vmax=1)
+ax.set_xticks(range(len(corr.columns)), corr.columns, rotation=45, ha="right", fontsize=8)
+ax.set_yticks(range(len(corr.columns)), corr.columns, fontsize=8)
+for i in range(len(corr.columns)):
+    for j in range(len(corr.columns)):
+        ax.text(j, i, f"{corr.values[i, j]:.2f}", ha="center", va="center", fontsize=7,
+                color="white" if abs(corr.values[i, j]) > 0.5 else "black")
+ax.set_title("Correlation matrix: delivery, satisfaction & money")
+fig.colorbar(im, shrink=0.75)
+savefig("viz_01_correlation_heatmap.png")
+plt.tight_layout(); plt.show()
+"""))
+
+cells.append(code(r"""
+# satisfaction gap: review score vs delivery performance (H1)
+on = m[m["is_late"] == 0]["review_score"]
+la = m[m["is_late"] == 1]["review_score"]
+gap = on.mean() - la.mean()
+print(f"H1 check — on-time mean score {on.mean():.2f} vs late mean score {la.mean():.2f}")
+print(f"Satisfaction gap: {gap:.2f} points (reference ~1.73)")
+# quick manual sanity: correlation between is_late and score
+print(f"Point-biserial-style corr (is_late vs score): {m['is_late'].corr(m['review_score']):.3f}")
+"""))
+
+cells.append(code(r"""
+fig, ax = plt.subplots(figsize=(9.5, 4.5))
+ax.boxplot([on, la], tick_labels=["On-time", "Late"])
+ax.set_ylabel("Review score")
+ax.set_title("Review-score distribution: on-time vs late (H1)")
+savefig("viz_03_on_vs_late_score.png")
+plt.tight_layout(); plt.show()
+"""))
+
+# --------------------------------------------------------------------------- #
 # ASSEMBLY - later sections append above this line
 # --------------------------------------------------------------------------- #
 def build():
