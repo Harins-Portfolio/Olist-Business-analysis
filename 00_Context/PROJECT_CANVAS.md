@@ -3,11 +3,11 @@
 
 ---
 
-- **Last updated:** 2026-08-06
+- **Last updated:** 2026-08-07
 - **Owned by:** Nikhil Harins (Business Analyst) + AI Consultant
 - **Project slug:** `olist`
 - **Status:** Phase 1 complete → **Phase 2/3 — Full EDA complete** (delivered-order view) → cleaning + KPI formalisation next
-- **Evidence source:** `04_Python/olist_eda.ipynb` (executed) → `06_AI/Outputs/Generated_Insights/eda_summary.json`
+- **Evidence source:** `04_Python/olist_full_analysis.ipynb` (consolidated step-by-step; old notebooks archived in `04_Python/archive/`) → `06_AI/Outputs/Generated_Insights/eda_summary.json`
 - **Source of truth that generates this:** `06_AI/Systems/Core/CLAUDE_OLIST.md` + `spec.md`
 
 ---
@@ -137,7 +137,7 @@ Dimensions assessed: **Completeness, Consistency, Accuracy, Timeliness, Uniquene
 | olist_customers | 99,441 | ✅ no nulls | ✅ | ✅ `customer_unique_id` **must** use (not customer_id) | ✅ | ✅ 0 dups | clean |
 | olist_geolocation | 1,000,163 | ✅ no nulls | ✅ | ☐ ~19k real zips inside 1M rows | ✅ | ❌ **261,831 dups** | dedup 1 GPS/zips; drop carrier |
 | olist_order_items | 112,650 | ✅ | ✅ | ✅ | ✅ | ✅ | clean |
-| olist_order_payments | 103,886 | ✅ | ☐ 3 rows `not_defined` | ✅ | ✅ | ✅ | drop 3 not_defined |
+| olist_order_payments | 103,886 | ✅ | ☐ 3 rows `not_defined` | ✅ | ✅ | ✅ | 3 `not_defined` kept+aggregated (negligible) |
 | olist_order_reviews | 99,224 | ❌ `review_comment_title` 88% null; message 59% null | ✅ | ✅ | ✅ | ✅ | exclude title column from KPIs |
 | olist_orders | 99,441 | ☐ approval nil 160·carrier 1,783·delivery 2,965 | ✅ | ☐ status spread (approved/created/… 5–325 rows) | ✅ | ✅ | filter `delivered`; flag null dates |
 | olist_products | 32,951 | ☐ 610 uncategorized + 2 null dimension rows | ✅ | ✅ | ✅ | ✅ | label `uncategorized`; drop 2 null dims |
@@ -189,6 +189,15 @@ Dimensions assessed: **Completeness, Consistency, Accuracy, Timeliness, Uniquene
 | 2026-08-06 | **Geolocation: one GPS per zip; 31 out-of-Brazil points removed** | Cleaning | 19,011 zips final; matches EDA §5 |
 | 2026-08-06 | **BOTH revenue columns kept in master** — `order_revenue` (goods, ~R$ 13.2M) AND `order_revenue_incl_freight` (goods+freight, ~R$ 15.4M) | Visualization prep | dashboard headline uses `order_revenue` (matches EDA/AOV R$ 137); incl-freight available for freight-burden story |
 | 2026-08-06 | **Star schema exported for Power BI** → `02_Cleaned_data/star_schema/` (`build_star_schema.py`) | Power BI prep | 7 tables: Dim_Date/Customer/Product/Seller/Geography + Fact_Orders (order grain) + Fact_OrderItems (line grain, enables category/seller). Both revenue definitions in Fact_Orders. Line `line_price` sums exactly to order revenue (R$ 13.2M) — no double count if one grain per visual. `data_model.md` documents keys/relationships/DAX |
+| 2026-08-07 | **Zip codes must be TEXT, never integer** (CEP leading-zero significant `04106` ≠ `4106`) | Validation | fixed actual data loss this session (§8); DDL/import forces TEXT |
+| 2026-08-07 | **`not_defined` payments (3) kept aggregated** (do not re-drop) | Validation | negligible impact; canvas §5 wording corrected from "drop 3" → "3 aggregated" |
+| 2026-08-07 | **Unknown SQL analyzer:** load PostgreSQL only; Power BI star optional in `olist` schema | SQL prep | `03_SQL/00_create_schema.sql` normal schema; zips TEXT |
+| 2026-08-07 | **Local Postgres conn resolved** — superuser `postgres` password = `postgres`, target DB = existing `Olist` | Build | .env.txt corrected (gitignored); no temp `trust` reset needed |
+| 2026-08-07 | **Load scope = normalized core only** (9 tables) into DB `Olist`. Flat `olist.master` + Power-BI star **not** loaded | Build | diverges from earlier "normalized + star" scope; star DDL kept as optional `03_SQL/00b_create_star_schema.sql` |
+| 2026-08-07 | **Product dims hold counts as NUMERIC, not INTEGER** (`product_name_lenght/_description_lenght/photos_qty`) | Build | cleaned CSV stores these as decimals (`40.0`); INTEGER rejected the COPY |
+| 2026-08-07 | **`reviews` keyed by `order_id`, NOT `review_id`** | Build | per `clean_check.json` order_id is the unique key (98,673); review_id repeats across orders in the cleaned export. Column order matches the CSV (COPY maps by position, not name) |
+| 2026-08-07 | **Star DDL split to `03_SQL/00b_create_star_schema.sql`** (optional, not run) | Build | keeps `00_create_schema.sql` = normalized default |
+| 2026-08-16 | **Consolidated the three EDA/analysis notebooks into a single `04_Python/olist_full_analysis.ipynb`** (step-by-step, from-scratch, clean outputs) | Build | built via `04_Python/build_full_analysis_nb.py` + verified headless via `04_Python/verify_notebook.py`; old notebooks moved to `04_Python/archive/`; all outputs regenerated (eda_summary.json 20 keys, 8 viz PNGs, descriptive_analysis.html) |
 
 ---
 
@@ -202,6 +211,12 @@ Dimensions assessed: **Completeness, Consistency, Accuracy, Timeliness, Uniquene
 | 2026-08-06 | **Phase 2 cleaning & preparation executed** | `data_preparation.py` → 11 files in `02_Cleaned_data/` + `olist_master.csv` (96,456 delivered orders × 40 cols). Master matches EDA baselines (score 4.16, 12.1d delivery, 8.1% late, AOV R$ 136.83, revenue R$ 13.20M). Audit + summary → `06_AI/Outputs/Generated_Docs/` |
 | 2026-08-06 | **High-impact visualizations built** (`04_Python/visualization_insights.ipynb`) | 8 Matplotlib PNGs → `06_AI/Outputs/Generated_Charts/`: correlation heatmap `viz_01`, H1 dose-response `viz_02`, on-vs-late gap `viz_03`, volume-vs-AOV `viz_04`, repeat rate `viz_05`, state delivery↔score `viz_06`, freight burden `viz_07`, category/state concentration `viz_08`. Master-backed figures: repeat rate **3.0%** (2,801/93,336), H1 gap **1.72★** (4.29 vs 2.57), freight **16.6%**, late **8.1%**. |
 | 2026-08-06 | **Star schema exported for Power BI** → `02_Cleaned_data/star_schema/` | 7 tables (5 dims + 2 facts) + `data_model.md`. Integrity: line `line_price` R$ 13.20M == Fact_Orders `order_revenue`, line freight == `total_freight`, 0 orphan item rows, 96,456 order-level rows. Ready for Power BI import in Phase 5 |
+| 2026-08-07 | **Complete clean-check** (`04_Python/ETL/validate_clean_data.py`) | Independent verification → `clean_check.json` + `clean_check_report.md`: 110 PASS / 0 FAIL / 1 WARN (`not_defined`) / 2 INFO. Inputs: per-table quality, PK/composite keys, RI, sum reconciliation. |
+| 2026-08-07 | **CRITICAL: zip leading-zero data loss fixed** | Review (reviewer subagent) flagged CEP zero-stripping. Root cause `data_preparation.py`: `load()` dtype key (`zip_code_prefix`) didn't match geolocation column (`geolocation_zip_code_prefix`) so zips coerced to int; customers read by default dtype. Fixed + regenerated all `02_Cleaned_data/` outputs. |
+| 2026-08-07 | **PostgreSQL prep** (`03_SQL/`) | Created `00_create_schema.sql` (normal model + optional star), `01_load_data.sql` (`\copy`, UTF8), `02_analysis_queries.sql` (starter queries for business questions). |
+| 2026-08-07 | **Load executed & verified → db `Olist`** | Created schema + loaded **9 normalized tables** via `psql \copy`. All counts == `clean_check.json`: customers 99,441 · geography 19,011 · order_items 112,647 · orders 96,456 · orders_items_aggregated 98,663 · payments 99,440 · products 32,951 · reviews 98,673 · sellers 3,095. Numbers reconcile to the cent (delivered): items R$ 13,197,189.09 ✓ freight R$ 2,197,044.12 ✓. **Zip leading-zero intact**: customers 23,995 leading-zero CEPs, zips 5-char TEXT ✓. |
+| 2026-08-07 | **Model caveat documented** | `reviews` (98,673) and `orders_items_aggregated` (98,663) contain rows beyond the 96,456 delivered orders — join to `olist.orders` (or filter `order_status='delivered'`) for the delivered-universe analysis. DB `Olist` collation = `Spanish_Spain.1252` (accents fine). |
+| 2026-08-16 | **Built + verified the consolidated notebook** (`04_Python/olist_full_analysis.ipynb`) | 12 sections, 51 cells, all range assertions **PASS**; H1 confirmed (late-vs-ontime gap **1.73**); repeat rate **3.0%**; SP **38%** of revenue |
 
 ---
 
