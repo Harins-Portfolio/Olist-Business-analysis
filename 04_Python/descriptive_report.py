@@ -370,6 +370,7 @@ details summary {{ cursor:pointer; font-weight:600; color:{NAVY}; margin-top:6px
 .charts > div {{ min-width:0; }}
 .chart .caption {{ font-size:11px; color:#6b7684; margin:3px 2px 0; }} 
 .ov {{ background:#fff; border:1px solid #e3e8ee; border-radius:10px; padding:18px 22px; margin-bottom:22px; }}
+.ov .hint {{ color:#6b7684; font-size:13px; margin:0 0 12px; }}
 .ov .kpis {{ display:flex; gap:16px; flex-wrap:wrap; margin:12px 0; }}
 .kpi {{ background:#eef6f1; border-left:4px solid {GREEN}; padding:10px 16px; border-radius:6px; }}
 .kpi b {{ font-size:20px; display:block; }}
@@ -379,7 +380,7 @@ details summary {{ cursor:pointer; font-weight:600; color:{NAVY}; margin-top:6px
 <body>
 <header>
   <h1>📊 Olist — Descriptive Analysis of All Cleaned Datasets</h1>
-  <div class="sub">18 tables · one page per table · DAMA-5 scored · clean-check re-run · generated {v['generated_at'].replace('T', ' ')}</div>
+  <div class="sub">Overview + 18 tables · one page per table · DAMA-5 scored · clean-check re-run · generated {v['generated_at'].replace('T', ' ')}</div>
 </header>
 <main>
 <nav><ul>
@@ -390,8 +391,9 @@ details summary {{ cursor:pointer; font-weight:600; color:{NAVY}; margin-top:6px
   {''.join(nav_star)}
 </ul></nav>
 <div class="content">
-  <div class="ov" id="overview">
+  <section class="ov page" id="page-overview">
     <h2>✅ Everything-at-a-glance</h2>
+    <p class="hint">Use the sidebar to open any table on its own page — one page per table, grouped by <b>Flat files</b> (SQL/analytics) and <b>Star schema</b> (Power BI).</p>
     <div class="kpis">
       <div class="kpi"><b>{len(dl.TABLES)}</b> tables profiled</div>
       <div class="kpi"><b>{counts['PASS']}</b> checks passed</div>
@@ -402,7 +404,7 @@ details summary {{ cursor:pointer; font-weight:600; color:{NAVY}; margin-top:6px
     <p>Clean-check verdict: {summary_badges} — status <b>{'READY ✅' if counts['FAIL'] == 0 else 'NOT READY ❌'}</b>.</p>
     <h3>Overview grid</h3>
     {overview.to_html(index=False, escape=False, border=0, classes='cols')}
-  </div>
+  </section>
   {''.join(sections)}
 </div>
 </main>
