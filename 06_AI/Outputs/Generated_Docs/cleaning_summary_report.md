@@ -1,6 +1,6 @@
 # OLIST — CLEANING SUMMARY REPORT (Phase 2, prompt 2.9)
 
-_Generated: 2026-08-06T20:47:43  |  pipeline: `04_Python/ETL/data_preparation.py`_
+_Generated: 2026-08-16T13:17:25  |  pipeline: `04_Python/ETL/data_preparation.py`_
 
 
 ## 1. Row counts — original vs final
@@ -37,7 +37,7 @@ _Generated: 2026-08-06T20:47:43  |  pipeline: `04_Python/ETL/data_preparation.py
 - **Rows:** 96,456 delivered orders   **Columns:** 40
 - **Date range:** 2016-09-15 → 2018-08-29
 - **Unique customers:** 93,336   **Gross revenue:** R$ 13,197,189.09
-- **% late orders:** 8.1%   **Null counts:** {"order_approved_at": 14, "order_delivered_carrier_date": 1, "total_payment_value": 1, "payment_types_used": 1, "payment_installments_max": 1, "item_count": 3, "total_items_price": 3, "total_freight": 3, "n_sellers": 3, "seller_ids": 3, "product_ids": 3, "review_id": 645, "review_score": 645, "review_comment_title": 85270, "review_comment_message": 57547, "review_creation_date": 645, "review_answer_timestamp": 645, "order_revenue": 3, "order_revenue_incl_freight": 3}
+- **% late orders:** 6.76%   **Null counts:** {"order_approved_at": 14, "order_delivered_carrier_date": 1, "total_payment_value": 1, "payment_types_used": 1, "payment_installments_max": 1, "item_count": 3, "total_items_price": 3, "total_freight": 3, "n_sellers": 3, "seller_ids": 3, "product_ids": 3, "review_id": 645, "review_score": 645, "review_comment_title": 85270, "review_comment_message": 57547, "review_creation_date": 645, "review_answer_timestamp": 645, "order_revenue": 3, "order_revenue_incl_freight": 3}
 - **Key columns for Phase 3+:** `order_revenue`, `total_payment_value`, `total_items_price`, `total_freight`, `item_count`, `payment_installments_max`, `payment_types_used`, `review_score`, `is_late`, `delivery_days`, `days_early_or_late`, `promised_delivery_days`, `order_month`, `order_year`, `is_weekend`, `purchase_hour`, `customer_state`, `customer_unique_id`, `seller_ids`, `product_ids`.
 
 ## 5. Remaining data-quality issues that could affect analysis

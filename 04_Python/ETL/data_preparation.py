@@ -57,9 +57,24 @@ def save(df: pd.DataFrame, name: str, where: Path = CLEAN) -> pd.DataFrame:
     return df
 
 
+def to_nullable_int(s: pd.Series) -> pd.Series:
+    """Cast to a nullable integer dtype so integer-semantic columns keep their
+    values as integers (and nulls stay null) instead of surfacing as float."""
+    return pd.to_numeric(s, errors="coerce").astype("Int64")
+
+
 def load(name: str) -> pd.DataFrame:
     path = RAW / name
-    df = pd.read_csv(path, dtype={"zip_code_prefix": str})
+    # Keep every zip/CEP column as TEXT - CEP codes are leading-zero significant
+    # (e.g. "04106"). Coercing to int strips the zeros and silently corrupts the
+    # zip. geolocation uses 'geolocation_zip_code_prefix', not 'zip_code_prefix',
+    # so a fixed single key would silently miss it. Read the header to build a
+    # complete zip-column dtype map instead.
+    probe = pd.read_csv(path, nrows=1)
+    zip_cols = [c for c in probe.columns
+                if c == "zip_code_prefix" or c.endswith("_zip_code_prefix")]
+    dtype_zip = {c: str for c in zip_cols}
+    df = pd.read_csv(path, dtype=dtype_zip)
     audit.setdefault(name, {})["rows_in"] = len(df)
     return df
 
@@ -106,8 +121,10 @@ def clean_orders() -> tuple[pd.DataFrame, pd.DataFrame]:
     save(missing, "orders_delivery_date_missing.csv", SCRATCH)
 
     ok = delivered[delivered["order_delivered_customer_date"].notna()].copy()
-    ok["delivery_days"] = (ok["order_delivered_customer_date"]
-                           - ok["order_purchase_timestamp"]).dt.days.astype(float)
+    # whole-day metric: timestamps normalized to date so time-of-day is ignored
+    ok["delivery_days"] = to_nullable_int(
+        (ok["order_delivered_customer_date"].dt.normalize()
+         - ok["order_purchase_timestamp"].dt.normalize()).dt.days)
 
     outliers = ok[(ok["delivery_days"] < DELIVERY_MIN) | (ok["delivery_days"] > DELIVERY_MAX)].copy()
     save(outliers, "orders_delivery_outliers.csv", SCRATCH)
@@ -206,6 +223,11 @@ def clean_products() -> pd.DataFrame:
         columns={"product_category_name_english": "category_english"})
     prod = prod.merge(trans, on="product_category_name", how="left")
     prod["category_english"] = prod["category_english"].fillna("uncategorized")
+
+    # integer-semantic columns stay integers (nullable Int64 keeps nulls intact)
+    for c in ["product_photos_qty", "product_name_lenght", "product_description_lenght"]:
+        if c in prod.columns:
+            prod[c] = to_nullable_int(prod[c])
     save(prod, "products_clean.csv")
 
     audit["products"]["unique_categories"] = int(prod["category_english"].nunique())
@@ -247,6 +269,9 @@ def clean_geolocation() -> pd.DataFrame:
     audit["geolocation"]["out_of_bounds"] = int(len(geo_bad))
 
     geo = geo[in_box].drop_duplicates("geolocation_zip_code_prefix", keep="first")
+    # keep one coordinate pair: the derived latitude/longitude, drop the raw
+    # geolocation_lat/lng originals (identical data, duplicate columns otherwise)
+    geo = geo.drop(columns=["geolocation_lat", "geolocation_lng"])
     audit["geolocation"]["final_zips"] = int(len(geo))
     save(geo, "geolocation_clean.csv")
     return geo
@@ -259,7 +284,8 @@ def build_master(orders_clean: pd.DataFrame,
                  payments: pd.DataFrame,
                  items_aggr: pd.DataFrame,
                  reviews: pd.DataFrame) -> pd.DataFrame:
-    cust = pd.read_csv(RAW / "olist_customers_dataset.csv")
+    cust = pd.read_csv(RAW / "olist_customers_dataset.csv",
+                       dtype={"customer_zip_code_prefix": str})
 
     m = (orders_clean
          .merge(cust, on="customer_id", how="left")
@@ -268,18 +294,23 @@ def build_master(orders_clean: pd.DataFrame,
          .merge(reviews, on="order_id", how="left"))
 
     # ---- derived columns (descriptive / diagnostic / predictive-ready) ----
-    m["delivery_days"] = m["delivery_days"].astype(float)
-    m["days_early_or_late"] = ((m["order_estimated_delivery_date"]
-                                - m["order_delivered_customer_date"]).dt.days).astype(float)
+    # All day-count columns are WHOLE numbers: timestamps are normalized to the
+    # date (time-of-day ignored) and stored as nullable integers so a value of
+    # e.g. 5 really means "5 calendar days".
+    m["delivery_days"] = to_nullable_int(m["delivery_days"])
+    m["days_early_or_late"] = to_nullable_int(
+        (m["order_estimated_delivery_date"].dt.normalize()
+         - m["order_delivered_customer_date"].dt.normalize()).dt.days)
     m["is_late"] = (m["days_early_or_late"] < 0).astype(int)
     m["order_month"] = m["order_purchase_timestamp"].dt.strftime("%Y-%m")
     m["order_year"] = m["order_purchase_timestamp"].dt.year
     m["order_day_of_week"] = m["order_purchase_timestamp"].dt.dayofweek       # Mon=0..Sun=6
     m["is_weekend"] = (m["order_day_of_week"] >= 5).astype(int)
     m["purchase_hour"] = m["order_purchase_timestamp"].dt.hour
-    m["promised_delivery_days"] = ((m["order_estimated_delivery_date"]
-                                    - m["order_purchase_timestamp"]).dt.days).astype(float)
-    m["delivery_lag_vs_promise_days"] = m["days_early_or_late"].astype(float)  # - = late, + = early
+    m["promised_delivery_days"] = to_nullable_int(
+        (m["order_estimated_delivery_date"].dt.normalize()
+         - m["order_purchase_timestamp"].dt.normalize()).dt.days)
+    m["delivery_lag_vs_promise_days"] = m["days_early_or_late"]  # - = late, + = early
     m["has_review_comment"] = m["review_comment_message"].notna().astype(int)
 
     # one clean "revenue" column: MERCHANDISE value (total items price) so it
@@ -292,7 +323,10 @@ def build_master(orders_clean: pd.DataFrame,
     m["total_payment_value"] = m["total_payment_value"].astype(float)
     m["total_items_price"] = m["total_items_price"].astype(float)
     m["total_freight"] = m["total_freight"].astype(float)
-    m["payment_installments_max"] = m["payment_installments_max"].astype(float)
+
+    # integer-semantic columns stay integers (nullable Int64 keeps nulls intact)
+    for c in ["payment_installments_max", "item_count", "n_sellers", "review_score"]:
+        m[c] = to_nullable_int(m[c])
 
     m = m.sort_values("order_purchase_timestamp").reset_index(drop=True)
     save(m, "olist_master.csv")

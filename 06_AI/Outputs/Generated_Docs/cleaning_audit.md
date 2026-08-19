@@ -1,6 +1,6 @@
 # DATA QUALITY AUDIT — Olist (Phase 2, prompt 2.1)
 
-_Generated: 2026-08-06T20:47:43  |  source: 01_Raw_Data (never modified)_
+_Generated: 2026-08-16T13:17:25  |  source: 01_Raw_Data (never modified)_
 
 
 ## T2.1 — Raw-file snapshot

@@ -7,7 +7,7 @@
 - **Owned by:** Nikhil Harins (Business Analyst) + AI Consultant
 - **Project slug:** `olist`
 - **Status:** Phase 1 complete → **Phase 2/3 — Full EDA complete** (delivered-order view) → cleaning + KPI formalisation next
-- **Evidence source:** `04_Python/olist_full_analysis.ipynb` (consolidated step-by-step; old notebooks archived in `04_Python/archive/`) → `06_AI/Outputs/Generated_Insights/eda_summary.json`
+- **Evidence source:** `04_Python/olist_eda.ipynb` (EDA/statistics) + `04_Python/visualization_insights.ipynb` (charts) + `04_Python/descriptive_analysis.ipynb` (descriptive profiling) → `06_AI/Outputs/Generated_Insights/eda_summary.json`
 - **Source of truth that generates this:** `06_AI/Systems/Core/CLAUDE_OLIST.md` + `spec.md`
 
 ---
@@ -198,6 +198,7 @@ Dimensions assessed: **Completeness, Consistency, Accuracy, Timeliness, Uniquene
 | 2026-08-07 | **`reviews` keyed by `order_id`, NOT `review_id`** | Build | per `clean_check.json` order_id is the unique key (98,673); review_id repeats across orders in the cleaned export. Column order matches the CSV (COPY maps by position, not name) |
 | 2026-08-07 | **Star DDL split to `03_SQL/00b_create_star_schema.sql`** (optional, not run) | Build | keeps `00_create_schema.sql` = normalized default |
 | 2026-08-16 | **Consolidated the three EDA/analysis notebooks into a single `04_Python/olist_full_analysis.ipynb`** (step-by-step, from-scratch, clean outputs) | Build | built via `04_Python/build_full_analysis_nb.py` + verified headless via `04_Python/verify_notebook.py`; old notebooks moved to `04_Python/archive/`; all outputs regenerated (eda_summary.json 20 keys, 8 viz PNGs, descriptive_analysis.html) |
+| 2026-08-16 | **Reverted the notebook consolidation** — the three original notebooks are the working analysis artefacts again (`04_Python/olist_eda.ipynb`, `04_Python/visualization_insights.ipynb`, `04_Python/descriptive_analysis.ipynb`) | Build | consolidated `olist_full_analysis.ipynb` became confusing with broken cells; `olist_full_analysis.ipynb` + `build_full_analysis_nb.py` + `verify_notebook.py` + its plan/spec docs removed; outputs (eda_summary.json, viz PNGs, descriptive_analysis.html) unchanged and still regenerable from the originals |
 
 ---
 
@@ -217,6 +218,7 @@ Dimensions assessed: **Completeness, Consistency, Accuracy, Timeliness, Uniquene
 | 2026-08-07 | **Load executed & verified → db `Olist`** | Created schema + loaded **9 normalized tables** via `psql \copy`. All counts == `clean_check.json`: customers 99,441 · geography 19,011 · order_items 112,647 · orders 96,456 · orders_items_aggregated 98,663 · payments 99,440 · products 32,951 · reviews 98,673 · sellers 3,095. Numbers reconcile to the cent (delivered): items R$ 13,197,189.09 ✓ freight R$ 2,197,044.12 ✓. **Zip leading-zero intact**: customers 23,995 leading-zero CEPs, zips 5-char TEXT ✓. |
 | 2026-08-07 | **Model caveat documented** | `reviews` (98,673) and `orders_items_aggregated` (98,663) contain rows beyond the 96,456 delivered orders — join to `olist.orders` (or filter `order_status='delivered'`) for the delivered-universe analysis. DB `Olist` collation = `Spanish_Spain.1252` (accents fine). |
 | 2026-08-16 | **Built + verified the consolidated notebook** (`04_Python/olist_full_analysis.ipynb`) | 12 sections, 51 cells, all range assertions **PASS**; H1 confirmed (late-vs-ontime gap **1.73**); repeat rate **3.0%**; SP **38%** of revenue |
+| 2026-08-16 | **Reverted to the three original notebooks** (`04_Python/olist_eda.ipynb`, `04_Python/visualization_insights.ipynb`, `04_Python/descriptive_analysis.ipynb`) as the main analysis artefacts | Consolidated `04_Python/olist_full_analysis.ipynb` + `build_full_analysis_nb.py` + `verify_notebook.py` deleted; plan/spec docs for it removed; outputs kept |
 
 ---
 

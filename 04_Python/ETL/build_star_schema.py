@@ -85,11 +85,9 @@ def dim_date(master: pd.DataFrame):
 def dim_geography():
     df = pd.read_csv(CLEAN / "geolocation_clean.csv",
                      dtype={"geolocation_zip_code_prefix": str})
-    out = df[["geolocation_zip_code_prefix", "geolocation_lat", "geolocation_lng",
+    out = df[["geolocation_zip_code_prefix", "latitude", "longitude",
               "geolocation_city", "geolocation_state"]].rename(columns={
                   "geolocation_zip_code_prefix": "zip_code_prefix",
-                  "geolocation_lat": "latitude",
-                  "geolocation_lng": "longitude",
                   "geolocation_city": "city",
                   "geolocation_state": "state"})
     save(out, "Dim_Geography.csv")
@@ -116,6 +114,10 @@ def fact_orders(master: pd.DataFrame):
     out["is_ontime"] = 1 - out["is_late"]
     out["order_revenue"] = out["order_revenue"].round(2)
     out["order_revenue_gross"] = out["order_revenue_gross"].round(2)
+    # integer-semantic columns stay integers (nullable Int64 keeps nulls intact)
+    for c in ["payment_installments_max", "item_count", "review_score",
+              "delivery_days", "promised_delivery_days", "days_early_or_late"]:
+        out[c] = pd.to_numeric(out[c], errors="coerce").astype("Int64")
     out = out[["order_id", "customer_id", "order_date", "date_key",
                "order_revenue", "order_revenue_gross", "total_freight",
                "paid_amount", "payment_installments_max", "item_count",
@@ -137,11 +139,12 @@ def fact_order_items(items: pd.DataFrame, master: pd.DataFrame):
     it = it.merge(ctx, on="order_id", how="left")
     it["order_date"] = it["order_purchase_timestamp"]
     it["date_key"] = it["order_date"].dt.strftime("%Y%m%d").astype(int)
-    it["quantity"] = 1
     it["line_price"] = it["price"]
     it["line_freight"] = it["freight_value"]
+    # NOTE: the raw Olist items table has no quantity column, so no fabricated
+    # constant-1 'quantity' is emitted here (it would be misleading).
     out = it[["order_item_id", "order_id", "product_id", "seller_id",
-              "order_date", "date_key", "quantity", "line_price",
+              "order_date", "date_key", "line_price",
               "line_freight", "is_late"]].reset_index(drop=True)
     save(out, "Fact_OrderItems.csv")
     return out

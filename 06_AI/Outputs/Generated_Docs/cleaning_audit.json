@@ -92,7 +92,7 @@
     "cols": 40,
     "date_min": "2016-09-15",
     "date_max": "2018-08-29",
-    "pct_late": 8.1,
+    "pct_late": 6.76,
     "columns": [
       "order_id",
       "customer_id",

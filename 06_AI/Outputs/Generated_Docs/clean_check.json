@@ -1,0 +1,684 @@
+{
+  "generated_at": "2026-08-16T13:27:11",
+  "pipeline": "04_Python/ETL/validate_clean_data.py",
+  "checks": [
+    {
+      "check": "row_count",
+      "status": "PASS",
+      "detail": "96,456 rows",
+      "table": "olist_master.csv"
+    },
+    {
+      "check": "pk_unique",
+      "status": "PASS",
+      "detail": "order_id unique (96,456)",
+      "table": "olist_master.csv"
+    },
+    {
+      "check": "nulls",
+      "status": "PASS",
+      "detail": "master nulls confined to documented allowlist",
+      "table": "olist_master.csv"
+    },
+    {
+      "check": "row_count",
+      "status": "PASS",
+      "detail": "96,456 rows",
+      "table": "orders_clean.csv"
+    },
+    {
+      "check": "pk_unique",
+      "status": "PASS",
+      "detail": "order_id unique (96,456)",
+      "table": "orders_clean.csv"
+    },
+    {
+      "check": "nulls",
+      "status": "PASS",
+      "detail": "no unexpected nulls",
+      "table": "orders_clean.csv"
+    },
+    {
+      "check": "row_count",
+      "status": "PASS",
+      "detail": "96,478 rows",
+      "table": "orders_delivered.csv"
+    },
+    {
+      "check": "pk_unique",
+      "status": "PASS",
+      "detail": "order_id unique (96,478)",
+      "table": "orders_delivered.csv"
+    },
+    {
+      "check": "nulls",
+      "status": "PASS",
+      "detail": "no unexpected nulls",
+      "table": "orders_delivered.csv"
+    },
+    {
+      "check": "row_count",
+      "status": "PASS",
+      "detail": "99,440 rows",
+      "table": "payments_clean.csv"
+    },
+    {
+      "check": "pk_unique",
+      "status": "PASS",
+      "detail": "order_id unique (99,440)",
+      "table": "payments_clean.csv"
+    },
+    {
+      "check": "nulls",
+      "status": "PASS",
+      "detail": "no unexpected nulls",
+      "table": "payments_clean.csv"
+    },
+    {
+      "check": "row_count",
+      "status": "PASS",
+      "detail": "98,663 rows",
+      "table": "orders_items_aggregated.csv"
+    },
+    {
+      "check": "pk_unique",
+      "status": "PASS",
+      "detail": "order_id unique (98,663)",
+      "table": "orders_items_aggregated.csv"
+    },
+    {
+      "check": "nulls",
+      "status": "PASS",
+      "detail": "no unexpected nulls",
+      "table": "orders_items_aggregated.csv"
+    },
+    {
+      "check": "row_count",
+      "status": "PASS",
+      "detail": "112,647 rows",
+      "table": "items_clean.csv"
+    },
+    {
+      "check": "pk_unique",
+      "status": "PASS",
+      "detail": "(order_id+order_item_id) unique (112,647)",
+      "table": "items_clean.csv"
+    },
+    {
+      "check": "nulls",
+      "status": "PASS",
+      "detail": "no unexpected nulls",
+      "table": "items_clean.csv"
+    },
+    {
+      "check": "row_count",
+      "status": "PASS",
+      "detail": "98,673 rows",
+      "table": "reviews_clean.csv"
+    },
+    {
+      "check": "pk_unique",
+      "status": "PASS",
+      "detail": "order_id unique (98,673)",
+      "table": "reviews_clean.csv"
+    },
+    {
+      "check": "nulls",
+      "status": "PASS",
+      "detail": "no unexpected nulls",
+      "table": "reviews_clean.csv"
+    },
+    {
+      "check": "row_count",
+      "status": "PASS",
+      "detail": "32,951 rows",
+      "table": "products_clean.csv"
+    },
+    {
+      "check": "pk_unique",
+      "status": "PASS",
+      "detail": "product_id unique (32,951)",
+      "table": "products_clean.csv"
+    },
+    {
+      "check": "nulls",
+      "status": "PASS",
+      "detail": "no unexpected nulls",
+      "table": "products_clean.csv"
+    },
+    {
+      "check": "row_count",
+      "status": "PASS",
+      "detail": "19,011 rows",
+      "table": "geolocation_clean.csv"
+    },
+    {
+      "check": "pk_unique",
+      "status": "PASS",
+      "detail": "geolocation_zip_code_prefix unique (19,011)",
+      "table": "geolocation_clean.csv"
+    },
+    {
+      "check": "nulls",
+      "status": "PASS",
+      "detail": "no unexpected nulls",
+      "table": "geolocation_clean.csv"
+    },
+    {
+      "check": "row_count",
+      "status": "PASS",
+      "detail": "99,441 rows",
+      "table": "olist_customers_dataset.csv"
+    },
+    {
+      "check": "pk_unique",
+      "status": "PASS",
+      "detail": "customer_id unique (99,441)",
+      "table": "olist_customers_dataset.csv"
+    },
+    {
+      "check": "nulls",
+      "status": "PASS",
+      "detail": "no unexpected nulls",
+      "table": "olist_customers_dataset.csv"
+    },
+    {
+      "check": "row_count",
+      "status": "PASS",
+      "detail": "3,095 rows",
+      "table": "olist_sellers_dataset.csv"
+    },
+    {
+      "check": "pk_unique",
+      "status": "PASS",
+      "detail": "seller_id unique (3,095)",
+      "table": "olist_sellers_dataset.csv"
+    },
+    {
+      "check": "nulls",
+      "status": "PASS",
+      "detail": "no unexpected nulls",
+      "table": "olist_sellers_dataset.csv"
+    },
+    {
+      "check": "row_count",
+      "status": "PASS",
+      "detail": "96,456 rows",
+      "table": "star_schema/Fact_Orders.csv"
+    },
+    {
+      "check": "pk_unique",
+      "status": "PASS",
+      "detail": "order_id unique (96,456)",
+      "table": "star_schema/Fact_Orders.csv"
+    },
+    {
+      "check": "nulls",
+      "status": "PASS",
+      "detail": "no unexpected nulls",
+      "table": "star_schema/Fact_Orders.csv"
+    },
+    {
+      "check": "row_count",
+      "status": "PASS",
+      "detail": "110,170 rows",
+      "table": "star_schema/Fact_OrderItems.csv"
+    },
+    {
+      "check": "pk_unique",
+      "status": "PASS",
+      "detail": "(order_id+order_item_id) unique (110,170)",
+      "table": "star_schema/Fact_OrderItems.csv"
+    },
+    {
+      "check": "nulls",
+      "status": "PASS",
+      "detail": "no unexpected nulls",
+      "table": "star_schema/Fact_OrderItems.csv"
+    },
+    {
+      "check": "row_count",
+      "status": "PASS",
+      "detail": "99,441 rows",
+      "table": "star_schema/Dim_Customer.csv"
+    },
+    {
+      "check": "pk_unique",
+      "status": "PASS",
+      "detail": "customer_id unique (99,441)",
+      "table": "star_schema/Dim_Customer.csv"
+    },
+    {
+      "check": "nulls",
+      "status": "PASS",
+      "detail": "no unexpected nulls",
+      "table": "star_schema/Dim_Customer.csv"
+    },
+    {
+      "check": "row_count",
+      "status": "PASS",
+      "detail": "32,951 rows",
+      "table": "star_schema/Dim_Product.csv"
+    },
+    {
+      "check": "pk_unique",
+      "status": "PASS",
+      "detail": "product_id unique (32,951)",
+      "table": "star_schema/Dim_Product.csv"
+    },
+    {
+      "check": "nulls",
+      "status": "PASS",
+      "detail": "no unexpected nulls",
+      "table": "star_schema/Dim_Product.csv"
+    },
+    {
+      "check": "row_count",
+      "status": "PASS",
+      "detail": "3,095 rows",
+      "table": "star_schema/Dim_Seller.csv"
+    },
+    {
+      "check": "pk_unique",
+      "status": "PASS",
+      "detail": "seller_id unique (3,095)",
+      "table": "star_schema/Dim_Seller.csv"
+    },
+    {
+      "check": "nulls",
+      "status": "PASS",
+      "detail": "no unexpected nulls",
+      "table": "star_schema/Dim_Seller.csv"
+    },
+    {
+      "check": "row_count",
+      "status": "PASS",
+      "detail": "19,011 rows",
+      "table": "star_schema/Dim_Geography.csv"
+    },
+    {
+      "check": "pk_unique",
+      "status": "PASS",
+      "detail": "zip_code_prefix unique (19,011)",
+      "table": "star_schema/Dim_Geography.csv"
+    },
+    {
+      "check": "nulls",
+      "status": "PASS",
+      "detail": "no unexpected nulls",
+      "table": "star_schema/Dim_Geography.csv"
+    },
+    {
+      "check": "row_count",
+      "status": "PASS",
+      "detail": "763 rows",
+      "table": "star_schema/Dim_Date.csv"
+    },
+    {
+      "check": "pk_unique",
+      "status": "PASS",
+      "detail": "date_key unique (763)",
+      "table": "star_schema/Dim_Date.csv"
+    },
+    {
+      "check": "nulls",
+      "status": "PASS",
+      "detail": "no unexpected nulls",
+      "table": "star_schema/Dim_Date.csv"
+    },
+    {
+      "check": "domain",
+      "status": "PASS",
+      "detail": "review_score in 1..5 (violations=0)",
+      "table": "reviews_clean.csv"
+    },
+    {
+      "check": "domain",
+      "status": "PASS",
+      "detail": "is_late in {0,1} got ['0', '1']",
+      "table": "olist_master"
+    },
+    {
+      "check": "domain",
+      "status": "PASS",
+      "detail": "is_weekend in {0,1} got ['0', '1']",
+      "table": "olist_master"
+    },
+    {
+      "check": "domain",
+      "status": "PASS",
+      "detail": "has_review_comment in {0,1} got ['0', '1']",
+      "table": "olist_master"
+    },
+    {
+      "check": "money",
+      "status": "PASS",
+      "detail": "order_revenue non-negative",
+      "table": "olist_master.csv"
+    },
+    {
+      "check": "money",
+      "status": "PASS",
+      "detail": "order_revenue_incl_freight non-negative",
+      "table": "olist_master.csv"
+    },
+    {
+      "check": "money",
+      "status": "PASS",
+      "detail": "total_freight non-negative",
+      "table": "olist_master.csv"
+    },
+    {
+      "check": "money",
+      "status": "PASS",
+      "detail": "total_payment_value non-negative",
+      "table": "olist_master.csv"
+    },
+    {
+      "check": "money",
+      "status": "PASS",
+      "detail": "total_items_price non-negative",
+      "table": "olist_master.csv"
+    },
+    {
+      "check": "money",
+      "status": "PASS",
+      "detail": "order_revenue non-negative",
+      "table": "star_schema/Fact_Orders.csv"
+    },
+    {
+      "check": "money",
+      "status": "PASS",
+      "detail": "order_revenue_gross non-negative",
+      "table": "star_schema/Fact_Orders.csv"
+    },
+    {
+      "check": "money",
+      "status": "PASS",
+      "detail": "total_freight non-negative",
+      "table": "star_schema/Fact_Orders.csv"
+    },
+    {
+      "check": "money",
+      "status": "PASS",
+      "detail": "paid_amount non-negative",
+      "table": "star_schema/Fact_Orders.csv"
+    },
+    {
+      "check": "money",
+      "status": "PASS",
+      "detail": "line_price non-negative",
+      "table": "star_schema/Fact_OrderItems.csv"
+    },
+    {
+      "check": "money",
+      "status": "PASS",
+      "detail": "line_freight non-negative",
+      "table": "star_schema/Fact_OrderItems.csv"
+    },
+    {
+      "check": "money",
+      "status": "PASS",
+      "detail": "price non-negative",
+      "table": "items_clean.csv"
+    },
+    {
+      "check": "money",
+      "status": "PASS",
+      "detail": "freight_value non-negative",
+      "table": "items_clean.csv"
+    },
+    {
+      "check": "domain",
+      "status": "PASS",
+      "detail": "is_late in {0,1} got ['0', '1']",
+      "table": "Fact_Orders"
+    },
+    {
+      "check": "domain",
+      "status": "PASS",
+      "detail": "is_ontime in {0,1} got ['0', '1']",
+      "table": "Fact_Orders"
+    },
+    {
+      "check": "domain",
+      "status": "PASS",
+      "detail": "is_weekend in {0,1} got ['0', '1']",
+      "table": "Fact_Orders"
+    },
+    {
+      "check": "domain",
+      "status": "PASS",
+      "detail": "has_review_comment in {0,1} got ['0', '1']",
+      "table": "Fact_Orders"
+    },
+    {
+      "check": "text_keys",
+      "status": "PASS",
+      "detail": "order_id clean (bad=0)",
+      "table": "olist_master"
+    },
+    {
+      "check": "text_keys",
+      "status": "PASS",
+      "detail": "customer_id clean (bad=0)",
+      "table": "olist_master"
+    },
+    {
+      "check": "text_keys",
+      "status": "PASS",
+      "detail": "customer_unique_id clean (bad=0)",
+      "table": "olist_master"
+    },
+    {
+      "check": "text_keys",
+      "status": "PASS",
+      "detail": "customer_zip_code_prefix clean (bad=0)",
+      "table": "olist_master"
+    },
+    {
+      "check": "zip",
+      "status": "PASS",
+      "detail": "olist_master.csv.customer_zip_code_prefix: leading-zero zips preserved (raw 23,995 -> clean 23,255)",
+      "table": "olist_master.csv"
+    },
+    {
+      "check": "zip",
+      "status": "PASS",
+      "detail": "olist_customers_dataset.csv.customer_zip_code_prefix: leading-zero zips preserved (raw 23,995 -> clean 23,995)",
+      "table": "olist_customers_dataset.csv"
+    },
+    {
+      "check": "zip",
+      "status": "PASS",
+      "detail": "olist_sellers_dataset.csv.seller_zip_code_prefix: leading-zero zips preserved (raw 1,027 -> clean 1,027)",
+      "table": "olist_sellers_dataset.csv"
+    },
+    {
+      "check": "zip",
+      "status": "PASS",
+      "detail": "geolocation_clean.csv.geolocation_zip_code_prefix: leading-zero zips preserved (raw 245,733 -> clean 4,354)",
+      "table": "geolocation_clean.csv"
+    },
+    {
+      "check": "zip",
+      "status": "PASS",
+      "detail": "star_schema/Dim_Customer.csv.customer_zip_code_prefix: leading-zero zips preserved (raw 23,995 -> clean 23,995)",
+      "table": "star_schema/Dim_Customer.csv"
+    },
+    {
+      "check": "zip",
+      "status": "PASS",
+      "detail": "star_schema/Dim_Seller.csv.seller_zip_code_prefix: leading-zero zips preserved (raw 1,027 -> clean 1,027)",
+      "table": "star_schema/Dim_Seller.csv"
+    },
+    {
+      "check": "zip",
+      "status": "PASS",
+      "detail": "star_schema/Dim_Geography.csv.zip_code_prefix: leading-zero zips preserved (raw 245,733 -> clean 4,354)",
+      "table": "star_schema/Dim_Geography.csv"
+    },
+    {
+      "check": "date",
+      "status": "PASS",
+      "detail": "order_purchase_timestamp parses (96,456 ok, 0 bad)",
+      "table": "olist_master.csv"
+    },
+    {
+      "check": "date",
+      "status": "PASS",
+      "detail": "order_approved_at parses (96,442 ok, 0 bad)",
+      "table": "olist_master.csv"
+    },
+    {
+      "check": "date",
+      "status": "PASS",
+      "detail": "order_delivered_carrier_date parses (96,455 ok, 0 bad)",
+      "table": "olist_master.csv"
+    },
+    {
+      "check": "date",
+      "status": "PASS",
+      "detail": "order_delivered_customer_date parses (96,456 ok, 0 bad)",
+      "table": "olist_master.csv"
+    },
+    {
+      "check": "date",
+      "status": "PASS",
+      "detail": "order_estimated_delivery_date parses (96,456 ok, 0 bad)",
+      "table": "olist_master.csv"
+    },
+    {
+      "check": "date",
+      "status": "PASS",
+      "detail": "review_creation_date parses (95,811 ok, 0 bad)",
+      "table": "olist_master.csv"
+    },
+    {
+      "check": "date",
+      "status": "PASS",
+      "detail": "review_answer_timestamp parses (95,811 ok, 0 bad)",
+      "table": "olist_master.csv"
+    },
+    {
+      "check": "date",
+      "status": "PASS",
+      "detail": "delivered< purchase (n=0)",
+      "table": "olist_master.csv"
+    },
+    {
+      "check": "date",
+      "status": "PASS",
+      "detail": "order_purchase_timestamp parses (96,456 ok, 0 bad)",
+      "table": "orders_clean.csv"
+    },
+    {
+      "check": "date",
+      "status": "PASS",
+      "detail": "order_approved_at parses (96,442 ok, 0 bad)",
+      "table": "orders_clean.csv"
+    },
+    {
+      "check": "date",
+      "status": "PASS",
+      "detail": "order_delivered_carrier_date parses (96,455 ok, 0 bad)",
+      "table": "orders_clean.csv"
+    },
+    {
+      "check": "date",
+      "status": "PASS",
+      "detail": "order_delivered_customer_date parses (96,456 ok, 0 bad)",
+      "table": "orders_clean.csv"
+    },
+    {
+      "check": "date",
+      "status": "PASS",
+      "detail": "order_estimated_delivery_date parses (96,456 ok, 0 bad)",
+      "table": "orders_clean.csv"
+    },
+    {
+      "check": "date",
+      "status": "PASS",
+      "detail": "review_creation_date parses (98,673 ok, 0 bad)",
+      "table": "reviews_clean.csv"
+    },
+    {
+      "check": "date",
+      "status": "PASS",
+      "detail": "review_answer_timestamp parses (98,673 ok, 0 bad)",
+      "table": "reviews_clean.csv"
+    },
+    {
+      "check": "ri",
+      "status": "PASS",
+      "detail": "0 Fact_OrderItems.order_id not in Fact_Orders",
+      "table": "Fact_OrderItems"
+    },
+    {
+      "check": "ri",
+      "status": "PASS",
+      "detail": "0 Fact_OrderItems.product_id unresolved in Dim_Product",
+      "table": "Dim_Product"
+    },
+    {
+      "check": "ri",
+      "status": "PASS",
+      "detail": "0 Fact_OrderItems.seller_id unresolved in Dim_Seller",
+      "table": "Dim_Seller"
+    },
+    {
+      "check": "ri",
+      "status": "PASS",
+      "detail": "0 Fact_Orders.customer_id unresolved",
+      "table": "Dim_Customer"
+    },
+    {
+      "check": "ri",
+      "status": "PASS",
+      "detail": "0 fact date_key(s) unresolved in Dim_Date",
+      "table": "Dim_Date"
+    },
+    {
+      "check": "sum",
+      "status": "PASS",
+      "detail": "Fact_Orders.order_revenue 13,197,189.09 vs line_price 13,197,189.09",
+      "table": "sum"
+    },
+    {
+      "check": "sum",
+      "status": "PASS",
+      "detail": "Fact_Orders.total_freight 2,197,044.12 vs line_freight 2,197,044.12",
+      "table": "sum"
+    },
+    {
+      "check": "sum",
+      "status": "PASS",
+      "detail": "master rows 96,456 vs Fact_Orders 96,456",
+      "table": "master"
+    },
+    {
+      "check": "sum",
+      "status": "PASS",
+      "detail": "master.order_revenue 13,197,189.09 vs Fact 13,197,189.09",
+      "table": "master"
+    },
+    {
+      "check": "meta",
+      "status": "INFO",
+      "detail": "order_revenue_gross 15,394,233.21 (data_model.md 15,394,233.21)",
+      "table": "sum"
+    },
+    {
+      "check": "aov",
+      "status": "INFO",
+      "detail": "clean AOV 136.82 (doc headline 137.04 via 13,221,498/96,478)",
+      "table": "olist_master"
+    },
+    {
+      "check": "gap:not_defined",
+      "status": "WARN",
+      "detail": "3 orders carry payment_types_used containing 'not_defined' (canvas \u00a75 says drop 3)",
+      "table": "payments_clean"
+    }
+  ]
+}
